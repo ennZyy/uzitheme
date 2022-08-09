@@ -733,6 +733,3 @@ function wpds_increament_post_view() {
             update_post_meta($post->ID, $views_key, ++$views);
     }
 }
-
-require_once __DIR__ . '/class-Kama_SEO_Tags.php';
-Kama_SEO_Tags::init();
