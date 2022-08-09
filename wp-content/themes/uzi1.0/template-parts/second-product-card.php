@@ -2,13 +2,13 @@
 $product = wc_get_product();
 ?>
 
-<a href="<?php the_permalink(); ?>" class="best__item card">
+<a href="<?php the_permalink(); ?>" class="apr__item card">
     <div class="card__img">
         <picture>
             <source srcset="" type="image/webp">
             <img
-                    src="<?= wp_get_attachment_url($product->get_image_id()); ?>"
-                    alt="<?= the_title(); ?>"
+                src="<?= wp_get_attachment_url($product->get_image_id()); ?>"
+                alt="<?= the_title(); ?>"
             >
         </picture>
     </div>
@@ -52,4 +52,5 @@ $product = wc_get_product();
             </div>
         </div>
     </div>
+
 </a>

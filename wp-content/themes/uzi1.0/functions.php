@@ -667,26 +667,72 @@ function wcpdf_a6_packing_slips($paper_format, $template_type) {
 
     return $paper_format;
 }
-//add_action( 'woocommerce_before_calculate_totals', 'add_custom_price', 1000, 1);
-//function add_custom_price( $cart ) {
-//    if ( is_admin() && ! defined( 'DOING_AJAX' ) )
-//        return;
-//
-//    if ( did_action( 'woocommerce_before_calculate_totals' ) >= 2 )
-//        return;
-//
-//    echo '<pre>';
-//    print_r($cart->get_cart());
-//    echo '</pre>';
-//    die;
-//
-//    foreach ( $cart->get_cart() as $cart_item ) {
-//        if (isset($cart_item['custom_height']) && isset($cart_item['custom_width'])) {
-//            $new_price = $cart_item['data']->get_price() * $cart_item['custom_height'] * $cart_item['custom_width'];
-//            $cart_item['data']->set_price($new_price);
-//        }
-//    }
-//}
+
+//Add page with custom fields
+acf_add_options_page(array(
+    'page_title' => 'General options',
+    'menu_title' => 'General options',
+    'menu_slug' => 'general_options',
+    'capability' => 'edit_posts',
+    'redirect' => false
+));
+
+//Add custom class for menu items
+function add_custom_class_to_menu_item($classes, $item, $args)
+{
+    if ('Header menu' === $args->menu) {
+        $classes[] = 'header__nav_item';
+    } elseif ('Sub menu' === $args->menu) {
+        $classes[] = '';
+    }
+
+    return $classes;
+}
+add_filter('nav_menu_css_class', 'add_custom_class_to_menu_item', 10, 3);
+
+//Add custom class for url items
+function nav_link_filter( $atts, $item, $args, $depth ){
+    if ('Sub menu' === $args->menu) {
+        $atts['class'] = 'tbs__item swiper-slide';
+    }
+
+    return $atts;
+}
+add_filter( 'nav_menu_link_attributes', 'nav_link_filter', 10, 4 );
+
+
+add_filter("wp_head", "wpds_increament_post_view");
+function get_post_views($post_id=NULL){
+    global $post;
+    if($post_id==NULL)
+        $post_id = $post->ID;
+    if(!empty($post_id)){
+        $views_key = 'wpds_post_views';
+        $views = get_post_meta($post_id, $views_key, true);
+        if(empty($views) || !is_numeric($views)){
+            delete_post_meta($post_id, $views_key);
+            add_post_meta($post_id, $views_key, '0');
+            return "0";
+        }
+        else if($views == 1)
+            return "1";
+        return $views.'';
+    }
+}
+
+function wpds_increament_post_view() {
+    global $post;
+
+    if(is_singular()){
+        $views_key = 'wpds_post_views';
+        $views = get_post_meta($post->ID, $views_key, true);
+        if(empty($views) || !is_numeric($views)){
+            delete_post_meta($post->ID, $views_key);
+            add_post_meta($post->ID, $views_key, '1');
+        }else
+            update_post_meta($post->ID, $views_key, ++$views);
+    }
+}
 
 require_once __DIR__ . '/class-Kama_SEO_Tags.php';
 Kama_SEO_Tags::init();

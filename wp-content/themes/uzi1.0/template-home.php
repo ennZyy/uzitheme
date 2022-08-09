@@ -177,7 +177,7 @@ $about_us_settings = get_field('aboutus_settings');
                         <div class="best__list">
                             <?php while ($featured->have_posts()):
                                 $featured->the_post();
-                                get_template_part('template/product', 'card');
+                                get_template_part('template-parts/product', 'card');
                             endwhile;?>
                         </div>
                     <?php endif; ?>
@@ -354,7 +354,7 @@ $about_us_settings = get_field('aboutus_settings');
                             <div class="best__list">
                                 <?php while ($featured->have_posts()):
                                     $featured->the_post();
-                                    get_template_part('template/all-product', 'card');
+                                    get_template_part('template-parts/second-product', 'card');
                                 endwhile;?>
                             </div>
                         <?php endif; ?>

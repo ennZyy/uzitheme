@@ -1,106 +1,186 @@
 <?php
-/**
- * The template for displaying the footer
- *
- * Contains the closing of the #content div and all content after.
- *
- * @link https://developer.wordpress.org/themes/basics/template-files/#template-partials
- *
- * @package BPSD
- */
-$header=get_field('header', 'option');
-$footer=get_field('footer', 'option')
+$footer_settings = get_field('footer_settings', 'option');
+
+$phone = str_replace(array('+', ' ', '(' , ')', '-'), '', $footer_settings['contacts']['phone']);
+//echo '<pre>';
+//print_r($footer_settings);
+//echo '</pre>';
 ?>
 
 <footer class="footer">
-    <div class="container">
-        <div class="footer__wrap">
-            <div>
-                <h3 class="footer__title"><?php echo $footer['form']['title']; ?></h3>
-                <div class="footer__description"><?php echo $footer['form']['info']; ?></div>
-                <form class="footer-subscription" id="subscription">
-                    <input type="email" name="email" placeholder="Email" class="footer-subscription__input" required>
-                    <input type="submit" class="footer-subscription__button" value="SUBSCRIBE">
-                </form>
-            </div>
-            <div class="footer__social">
-                <ul class="footer-social__list">
-                    <li class="footer-social__item">
-                    <a class="footer-social__link" href="<?php echo $footer['social']['facebook']; ?>">
-                        <svg class="icon">
-                            <use xlink:href="<?php echo get_template_directory_uri() ?>/assets/img/stack/sprite.svg#facebook"></use>
-                        </svg>
+    <div class="footer__main">
+        <div class="container">
+            <div class="footer__main_in">
+                <div class="footer__main_top">
+                    <a href="#" class="footer__main_top_logo">
+                        <picture>
+                            <source srcset="" type="image/webp">
+                            <img src="<?= $footer_settings['logo']['url'] ?>">
+                        </picture>
                     </a>
-                    </li>
-                    <li class="footer-social__item">
-                    <a class="footer-social__link" href="<?php echo $footer['social']['instagram']; ?>">
-                        <svg class="icon">
-                            <use xlink:href="<?php echo get_template_directory_uri() ?>/assets/img/stack/sprite.svg#instagram"></use>
+                    <button class="footer__main_top_btn" id="upBtn">
+                        <svg width="18" height="10" viewBox="0 0 18 10" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M1.50019 9.73123C1.16174 10.0794 0.600522 10.0847 0.255384 9.74304C-0.0786184 9.41239 -0.0859278 8.87856 0.238899 8.53907L8.13756 0.283685C8.49272 -0.087521 9.08726 -0.0954994 9.45246 0.26604C9.80593 0.615962 9.8114 1.1816 9.46478 1.53816L1.50019 9.73123Z" fill="#5C82E4"/>
+                            <path d="M17.7456 8.53188C18.0848 8.86773 18.0848 9.41226 17.7456 9.74811C17.4063 10.084 16.8563 10.084 16.517 9.74811L8.53146 1.84259C8.19221 1.50674 8.19221 0.962208 8.53146 0.626355C8.87072 0.2905 9.42076 0.2905 9.76001 0.626355L17.7456 8.53188Z" fill="#5C82E4"/>
                         </svg>
-                    </a>
-                    </li>
-                </ul>
-            </div>
-            <div class="menu-item__grid" >
-                <?php
-                wp_nav_menu( [
-                    'theme_location'  => '',
-                    'menu'            => 'Footer menu',
-                    'container'       => '',
-                    'menu_class'      => 'footer-menu',
-                    'fallback_cb'     => 'wp_page_menu',
-                    'items_wrap'      => '<ul id="%1$s" class="%2$s">%3$s</ul>',
-                ] );
-                ?>
-            </div>
-            <div class="footer__copyright">
-                <ul class="footer__copyright-list">
-                <li class="footer__copyright-icon">
-                        <svg class="icon"><use xlink:href="<?php echo get_template_directory_uri() ?>/assets/img/stack/sprite.svg#visa"></use></svg>
-                    </li>
-                    <li class="footer__copyright-icon">
-                        <svg class="icon"><use xlink:href="<?php echo get_template_directory_uri() ?>/assets/img/stack/sprite.svg#mastercard"></use></svg>
-                    </li>
-                    <li class="footer__copyright-icon">
-                        <svg class="icon"><use xlink:href="<?php echo get_template_directory_uri() ?>/assets/img/stack/sprite.svg#apay"></use></svg>
-                    </li>
-                    <li class="footer__copyright-icon">
-                        <svg class="icon"><use xlink:href="<?php echo get_template_directory_uri() ?>/assets/img/stack/sprite.svg#gpay"></use></svg>
-                    </li>
-                    <li class="footer__copyright-icon">
-                        <svg class="icon"><use xlink:href="<?php echo get_template_directory_uri() ?>/assets/img/stack/sprite.svg#paypal"></use></svg>
-                    </li>
-                </ul>
-                <p class="footer__copyright-text"><?php echo $footer['copyrights']['text']; ?></p>
+
+                    </button>
+                </div>
+                <div class="footer__main_body">
+                    <div class="footer__main_body_item">
+                        <div class="item">
+                            <h3 class="item__head">
+                                Контакты
+                            </h3>
+                            <div class="item__list">
+                                <a href="mailto:siteadressmail@mail.ru" class="item__list_item">
+                                    Email: <span><?= $footer_settings['contacts']['email'] ?></span>
+                                </a>
+                                <a href="tel:+<?= $phone ?>" class="item__list_item">
+                                    Телефон: <span><?= $footer_settings['contacts']['phone'] ?></span>
+                                </a>
+                            </div>
+                        </div>
+
+                        <div class="item">
+                            <h3 class="item__head">
+                                Документы
+                            </h3>
+                            <div class="item__list">
+                                <?php foreach ($footer_settings['documents'] as $item): ?>
+                                    <a href="<?= $item['url'] ?>" class="item__list_item"><?= $item['text'] ?></a>
+                                <?php endforeach; ?>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="footer__main_body_item">
+                        <div class="item">
+                            <h3 class="item__head">
+                                Рейтинги
+                            </h3>
+                            <div class="item__list">
+                                <?php foreach ($footer_settings['rating'] as $item): ?>
+                                    <a href="<?= $item['url'] ?>" class="item__list_item"><?= $item['text'] ?></a>
+                                <?php endforeach; ?>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="footer__main_body_item">
+                        <div class="item">
+                            <h3 class="item__head">
+                                Лучшие производители
+                            </h3>
+                            <div class="item__list">
+                                <?php foreach ($footer_settings['top-producers'] as $item): ?>
+                                    <a href="<?= $item['url'] ?>" class="item__list_item"><?= $item['text'] ?></a>
+                                <?php endforeach; ?>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="footer__main_body_item">
+                        <div class="item">
+                            <h3 class="item__head">
+                                Лучшие аппараты
+                            </h3>
+                            <div class="item__list">
+                                <?php foreach ($footer_settings['best-devices'] as $item): ?>
+                                    <a href="<?= $item['url'] ?>" class="item__list_item"><?= $item['text'] ?></a>
+                                <?php endforeach; ?>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
             </div>
         </div>
     </div>
-
+    <div class="footer__bot">
+        <div class="container">
+            <div class="footer__bot_in">
+                <?= $footer_settings['copyright'] ?>
+            </div>
+        </div>
+    </div>
 </footer>
 
-<div class="page-nav">
-    <a href="tel:6193165780" class="page-nav__phone">
-        <div class="page-nav__phone-icon">
-            <svg class="icon">
-                <use xlink:href="<?php echo get_template_directory_uri() ?>/assets/img/stack/sprite.svg#phone-ico"></use>
+</div>
+<div class="addc">
+    <form class="addc__body">
+        <button type="button" class="addc__body_close">
+            <svg width="25" height="25" viewBox="0 0 25 25" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect width="3.20093" height="32.0093" rx="1.60047" transform="matrix(0.710018 0.704183 -0.710018 0.704183 22.7266 0)" fill="white"/>
+                <rect width="3.20093" height="32.0093" rx="1.60047" transform="matrix(0.710018 -0.704183 0.710018 0.704183 0 2.45947)" fill="white"/>
             </svg>
+
+        </button>
+        <div class="addc__body_in">
+            <h2 class="addc__body_head">
+                Добавление компании
+            </h2>
+            <div class="addc__body_upl">
+                <input type="file" id="upload">
+                <label class="addc__body_upl_in" for="upload">
+                    <div class="place"></div>
+                    <div class="body">
+                        <div class="body__name">Прикрепите лого компании</div>
+                        <div class="body__info">
+                            Рекомендуемый размер 700х210
+                        </div>
+                    </div>
+                </label>
+            </div>
+            <div class="addc__body_input">
+                <input type="text" placeholder="Название компании">
+            </div>
+            <div class="addc__body_text">
+                <textarea placeholder="Пропишите сюда описание компании и контакты"></textarea>
+            </div>
+            <div class="addc__body_action">
+                <button>Отправить</button>
+            </div>
         </div>
-    </a>
-    <a href="mailto:contact@bannerprintingsandiego.com" class="page-nav__email">
-        <div class="page-nav__email-icon">
-            <svg class="icon">
-                <use xlink:href="<?php echo get_template_directory_uri() ?>/assets/img/stack/sprite.svg#email-ico"></use>
-            </svg>
+    </form>
+</div>
+<!-- EX blocks -->
+
+<!-- Моибльное меню -->
+<div class="mobmenu">
+    <div class="mobmenu__in">
+        <div class="mobmenu__head">
+            <h3 class="mobmenu__head_title">
+                Меню
+            </h3>
+            <button class="mobmenu__head_close" id="mobmenuClose">
+                <svg width="25" height="25" viewBox="0 0 25 25" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path fill-rule="evenodd" clip-rule="evenodd" d="M0.741953 0.757274C-0.247318 1.76697 -0.247318 3.40402 0.741953 4.41372L8.95856 12.8L1.32979 20.5863C0.340522 21.596 0.340523 23.233 1.32979 24.2427C2.31906 25.2524 3.92299 25.2524 4.91226 24.2427L12.541 16.4564L20.0873 24.1585C21.0765 25.1682 22.6805 25.1682 23.6697 24.1585C24.659 23.1488 24.659 21.5118 23.6697 20.5021L16.1235 12.8L24.2576 4.49793C25.2468 3.48824 25.2468 1.85119 24.2576 0.841491C23.2683 -0.168207 21.6644 -0.168207 20.6751 0.841491L12.541 9.14355L4.32442 0.757274C3.33515 -0.252425 1.73122 -0.252424 0.741953 0.757274Z" fill="#2F2F2F"/>
+                </svg>
+
+            </button>
         </div>
-    </a>
-    <a href="#" id="page-up" class="page-nav__scroll">
-        <svg class="icon">
-            <use xlink:href="<?php echo get_template_directory_uri() ?>/assets/img/stack/sprite.svg#scroll"></use>
-        </svg>
-    </a>
+        <ul class="mobmenu__list">
+
+            <li class="mobmenu__item"><a href="#">УЗИ аппараты</a></li>
+            <li class="mobmenu__item"><a href="#">Датчики</a></li>
+            <li class="mobmenu__item"><a href="#">Рейтинги</a></li>
+            <li class="mobmenu__item"><a href="#">Статьи</a></li>
+            <li class="mobmenu__item"><a href="#">Производители</a></li>
+            <li class="mobmenu__item"><a href="#">Контакты</a></li>
+        </ul>
+        <div class="mobmenu__links">
+            <div class="mobmenu__links_item">
+                <div class="name">телефон</div>
+                <a href="tel:+74958312222" class="value">+7 (495) 831-22 -22</a>
+            </div>
+            <div class="mobmenu__links_item">
+                <div class="name">email</div>
+                <a href="mailto:siteadressmail@mail.ru" class="value">siteadressmail@mail.ru</a>
+            </div>
+        </div>
+    </div>
 </div>
 
 <?php wp_footer(); ?>
 
+<!-- Модалка для добавления компании -->
 </body>
 </html>
