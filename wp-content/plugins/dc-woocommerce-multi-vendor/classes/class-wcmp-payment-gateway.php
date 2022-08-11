@@ -38,7 +38,7 @@ abstract class WCMp_Payment_Gateway {
         }
         $transaction_args = array(
             'post_type' => 'wcmp_transaction',
-            'post_title' => sprintf(__('Transaction - %s', 'dc-woocommerce-multi-vendor'), strftime(_x('%B %e, %Y @ %I:%M %p', 'Transaction date parsed by strftime', 'dc-woocommerce-multi-vendor'), current_time( 'timestamp' ))),
+            'post_title' => sprintf(__('Transaction - %s', 'dc-woocommerce-multi-vendor'), utf8_encode(strftime(_x('%B %e, %Y @ %I:%M %p', 'Transaction date parsed by strftime', 'dc-woocommerce-multi-vendor'), current_time( 'timestamp' )))),
             'post_status' => $commission_status,
             'ping_status' => 'closed',
             'post_author' => $this->vendor->term_id

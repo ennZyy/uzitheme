@@ -203,7 +203,8 @@ class WCMp_Report_Product extends WC_Admin_Report {
                 'total_sales_arr' => $total_sales,
                 'orders' => $orders,
                 'start_date' => $start_date,
-                'end_date' => $end_date
+                'end_date' => $end_date,
+                'security'  =>  wp_create_nonce('wcmp-report')
             ));
 
             $report_chart = $report_html = '';

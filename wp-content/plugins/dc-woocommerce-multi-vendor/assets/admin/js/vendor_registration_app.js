@@ -355,7 +355,8 @@ app.controller('postbox_content',['$scope', '$http', 'vendor_registration_servic
         
         var data = jQuery.param({
             action: 'wcmp_save_vendor_registration_form',
-            form_data: JSON.stringify($scope.fields)
+            form_data: JSON.stringify($scope.fields),
+            security: vendor_registration_param.registration_nonce
         });
         //console.log(data);
         var config = {

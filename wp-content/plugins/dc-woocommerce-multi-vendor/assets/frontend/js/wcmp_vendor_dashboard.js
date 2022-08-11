@@ -8,7 +8,8 @@ jQuery(document).ready(function($){
 			lodder.show();			
 			var data = {
 				action : 'wcmp_dismiss_dashboard_announcements',
-				post_id : post_id
+				post_id : post_id,
+				security : wcmp_frontend_vdashboard_js_script_data.dashboard_nonce
 			}
 			$.post(wcmp_frontend_vdashboard_js_script_data.ajax_url, data, function(responsee) { 
 				element_to_be_refrash.html(responsee);			

@@ -67,7 +67,6 @@ class WCMp_Ajax {
 
         add_action('wp_ajax_wcmp_save_vendor_registration_form', array(&$this, 'wcmp_save_vendor_registration_form_callback'));
 
-        add_action('wp_ajax_dismiss_wcmp_servive_notice', array(&$this, 'dismiss_wcmp_servive_notice'));
         // search filter vendors from widget
         add_action('wp_ajax_vendor_list_by_search_keyword', array($this, 'vendor_list_by_search_keyword'));
         add_action('wp_ajax_nopriv_vendor_list_by_search_keyword', array($this, 'vendor_list_by_search_keyword'));
@@ -216,8 +215,14 @@ class WCMp_Ajax {
     }
 
     public function wcmp_datatable_get_vendor_orders() {
+        if ( ! current_user_can( 'edit_shop_orders' ) ) {
+                wp_die( -1 );
+        }
         global $wpdb, $WCMp;
         $requestData = ( $_REQUEST ) ? wp_unslash( $_REQUEST ) : array();
+        $nonce = isset($requestData["security"]) ? wc_clean($requestData["security"]) : '';
+        if (!wp_verify_nonce($nonce, 'wcmp-dashboard'))
+            wp_die(__('Invalid request', 'dc-woocommerce-multi-vendor'));
         $date_start = isset( $_POST['start_date'] ) ? wc_clean( $_POST['start_date'] ) : '';
         $date_end = isset( $_POST['end_date'] ) ? wc_clean( $_POST['end_date'] ) : '';
         $start_date = date('Y-m-d G:i:s', $date_start);
@@ -363,6 +368,7 @@ class WCMp_Ajax {
     }
 
     public function wcmp_save_vendor_registration_form_callback() {
+        check_ajax_referer('wcmp-registration', 'security');
         $form_data = json_decode(stripslashes_deep($_REQUEST['form_data']), true);
         if (!empty($form_data) && is_array($form_data)) {
             foreach ($form_data as $key => $value) {
@@ -395,16 +401,17 @@ class WCMp_Ajax {
         global $WCMp, $wpdb;
 
         if (!empty($_POST['pageno']) && !empty($_POST['term_id'])) {
-            $vendor = get_wcmp_vendor_by_term($_POST['term_id']);
+            $vendor = get_wcmp_vendor_by_term(absint($_POST['term_id']));
             $vendor_id = $vendor->id;
             $offset = $_POST['postperpage'] * $_POST['pageno'];
             $reviews_lists = $vendor->get_reviews_and_rating($offset);
-            $WCMp->template->get_template('review/wcmp-vendor-review.php', array('reviews_lists' => $reviews_lists, 'vendor_term_id' => $_POST['term_id']));
+            $WCMp->template->get_template('review/wcmp-vendor-review.php', array('reviews_lists' => $reviews_lists, 'vendor_term_id' => absint($_POST['term_id'])));
         }
         die;
     }
 
     function wcmp_add_review_rating_vendor() {
+        check_ajax_referer('wcmp-review', 'nonce');
         global $WCMp, $wpdb;
         $review = isset( $_POST['comment'] ) ? wc_clean( $_POST['comment'] ) : '';
         $rating = isset($_POST['rating']) ? intval( wp_unslash( $_POST['rating'] ) ): false;
@@ -480,6 +487,12 @@ class WCMp_Ajax {
     }
 
     public function wcmp_create_duplicate_product() {
+        if (!current_user_can('edit_products') ) {
+            wp_die(-1);
+        }
+        $nonce = isset($_POST["nonce"]) ? wc_clean($_POST["nonce"]) : '';
+        if (!wp_verify_nonce($nonce, 'wcmp-types'))
+            die('Invalid request');
         global $WCMp;
         $product_id = isset($_POST['product_id']) ? absint($_POST['product_id']) : 0;
         $parent_post = get_post($product_id);
@@ -599,7 +612,7 @@ class WCMp_Ajax {
     }
 
     public function wcmp_dismiss_dashboard_message() {
-        global $wpdb, $WCMp;
+        check_ajax_referer('wcmp-dashboard', 'security');
         $post_id = isset($_POST['post_id']) ? absint($_POST['post_id']) : 0;
         $current_user = wp_get_current_user();
         $current_user_id = $current_user->ID;
@@ -661,14 +674,14 @@ class WCMp_Ajax {
     }
 
     public function wcmp_msg_refresh_tab_data() {
-        global $wpdb, $WCMp;
-        $tab = isset($_POST['tabname']) ? wc_clean($_POST['tabname']) : '';
+        global $WCMp;
+        $tab = isset($_POST['tabname']) ? sanitize_key($_POST['tabname']) : '';
         $WCMp->template->get_template('vendor-dashboard/vendor-announcements/vendor-announcements' . str_replace("_", "-", $tab) . '.php');
         die;
     }
 
     public function wcmp_vendor_messages_operation() {
-        global $wpdb, $WCMp;
+        check_ajax_referer('grant-access', 'security');
         $current_user = wp_get_current_user();
         $current_user_id = $current_user->ID;
         $post_id = isset($_POST['msg_id']) ? wc_clean($_POST['msg_id']) : 0;
@@ -810,7 +823,12 @@ class WCMp_Ajax {
      */
     function unassign_vendor() {
         global $WCMp;
-
+        $nonce = isset($_POST["security"]) ? wc_clean($_POST["security"]) : '';
+        if (!wp_verify_nonce($nonce, 'search-products'))
+            wp_die(__('Invalid request', 'dc-woocommerce-multi-vendor'));
+        if ( ! current_user_can( 'edit_users' ) ) {
+            wp_die(__('Sorry, you cannot update vendors', 'dc-woocommerce-multi-vendor'));
+        }
         $product_id = isset($_POST['product_id']) ? absint($_POST['product_id']) : 0;
         $vendor = get_wcmp_product_vendors($product_id);
         $admin_id = get_current_user_id();
@@ -866,11 +884,10 @@ class WCMp_Ajax {
      * WCMp Product Report sorting
      */
     function product_report_sort() {
-        global $WCMp;
-        
+        check_ajax_referer('wcmp-report', 'security');
         $chart_arr = $html_chart = '';
         $dropdown_selected = isset($_POST['sort_choosen']) ? wc_clean($_POST['sort_choosen']) : '';
-        $total_sales_data = isset($_POST['total_sales_data']) ? wc_clean($_POST['total_sales_data']) : array();
+        $total_sales_data = isset($_POST['total_sales_data']) ? array_filter($_POST['total_sales_data']) : array();
         $arr_by_total_sales = $arr_by_admin_earning = $arr_by_vendor_earning = array();
 
         if ( $total_sales_data ) {
@@ -905,7 +922,7 @@ class WCMp_Ajax {
                 $vendor_earning_width = ( $sales_report['vendor_earning'] > 0 ) ? ( $sales_report['vendor_earning'] / round($sales_report['total_sales']) ) * 100 : 0;
                 $product = wc_get_product($sales_report['product_id']);
                 if ( $product ) {
-                    $product_url = admin_url('post.php?post=' . $product_id . '&action=edit');
+                    $product_url = admin_url('post.php?post=' . absint($product_id) . '&action=edit');
                     $report_chart .= '<tr><th><a href="' . $product_url . '">' . $product->get_title() . '</a></th>
                                             <td width="1%"><span>' . wc_price($sales_report['total_sales']) . '</span><span class="alt">' . wc_price($sales_report['admin_earning']) . '</span><span class="alt">' . wc_price($sales_report['vendor_earning']) . '</span></td>
                                             <td class="bars">
@@ -948,7 +965,6 @@ class WCMp_Ajax {
     }
 
     function send_enquiry_to_vendor($send_to, $product_id) {
-        global $WCMp;
         $vendor = get_wcmp_product_vendors($product_id);
         if ($vendor) {
             $send_to = $vendor->user_data->data->user_email;
@@ -960,8 +976,7 @@ class WCMp_Ajax {
      * WCMp Product Data Searching
      */
     function search_product_data() {
-        global $WCMp;
-
+        check_ajax_referer('wcmp-report', 'security');
         $product_id = isset($_POST['product_id']) ? absint($_POST['product_id']) : 0;
         $orders = isset($_POST['orders']) ? array_filter(wc_clean($_POST['orders'])) : array();
         $start_date = isset($_POST['start_date']) ? wc_clean($_POST['start_date']) : '';
@@ -1064,8 +1079,7 @@ class WCMp_Ajax {
      * WCMp Vendor Data Searching
      */
     function search_vendor_data() {
-        global $WCMp, $wpdb;
-
+        check_ajax_referer('wcmp-report', 'security');
         $chosen_product_ids = $vendor_id = $vendor = false;
         $gross_sales = $my_earning = $vendor_earning = 0;
         $vendor_term_id = isset($_POST['vendor_id']) ? absint($_POST['vendor_id']) : 0;
@@ -1221,8 +1235,8 @@ class WCMp_Ajax {
      * WCMp Banking Overview Data
      */
     public function banking_overview_search() {
-        global $WCMp, $wpdb;
-
+        global $WCMp;
+        check_ajax_referer('wcmp-report', 'security');
         $vendor_term_id = isset( $_POST['vendor_id'] ) ? absint( $_POST['vendor_id'] ) : 0;
         $vendor = get_wcmp_vendor_by_term($vendor_term_id);
         $vendor_id = ( $vendor ) ? $vendor->id : 0;
@@ -1243,7 +1257,7 @@ class WCMp_Ajax {
      * WCMp Vendor Report sorting
      */
     function vendor_report_sort() {
-        global $WCMp;
+        check_ajax_referer('wcmp-report', 'security');
         $chart_arr = $html_chart = '';
         $dropdown_selected = isset($_POST['sort_choosen']) ? wc_clean($_POST['sort_choosen']) : '';
         $total_sales_data = isset($_POST['total_sales_data']) ? array_filter($_POST['total_sales_data']) : array();
@@ -1276,7 +1290,7 @@ class WCMp_Ajax {
                 $total_sales_width = ( $report['total_sales'] > 0 ) ? round($report['total_sales']) / round($report['total_sales']) * 100 : 0;
                 $admin_earning_width = ( $report['admin_earning'] > 0 ) ? ( $report['admin_earning'] / round($report['total_sales']) ) * 100 : 0;
                 $vendor_earning_width = ( $report['vendor_earning'] > 0 ) ? ( $report['vendor_earning'] / round($report['total_sales']) ) * 100 : 0;
-                $chart_arr .= '<tr><th><a href="user-edit.php?user_id=' . $vendor_id . '">' . $vendor->page_title . '</a></th>
+                $chart_arr .= '<tr><th><a href="user-edit.php?user_id=' . absint($vendor_id) . '">' . $vendor->page_title . '</a></th>
                     <td class="sales_prices" width="1%">
                                             <span>' . wc_price($report['total_sales']) . '</span>'
                                             . '<span class="alt">' . wc_price($report['admin_earning']) . '</span>'
@@ -1326,6 +1340,12 @@ class WCMp_Ajax {
      */
     function transaction_done_button() {
         global $WCMp;
+        $nonce = isset($_REQUEST["nonce"]) ? wc_clean($_REQUEST["nonce"]) : '';
+        if (!wp_verify_nonce($nonce, 'wcmp-vendors'))
+            wp_die(__('Invalid request', 'dc-woocommerce-multi-vendor'));
+        if ( ! current_user_can( 'edit_users' ) ) {
+            wp_die(__('Sorry, you cannot update vendors', 'dc-woocommerce-multi-vendor'));
+        }
         $transaction_id = isset($_POST['trans_id']) ? wc_clean($_POST['trans_id']) : 0;
         $vendor_id = isset($_POST['vendor_id']) ? absint($_POST['vendor_id']) : 0 ;
         $vendor = get_wcmp_vendor_by_term( $vendor_id );
@@ -1373,7 +1393,12 @@ class WCMp_Ajax {
      * WCMp dismiss todo list
      */
     function dismiss_vendor_to_do_list() {
-        global $WCMp;
+        $nonce = isset($_REQUEST["nonce"]) ? wc_clean($_REQUEST["nonce"]) : '';
+        if (!wp_verify_nonce($nonce, 'wcmp-vendors'))
+            wp_die(__('Invalid request', 'dc-woocommerce-multi-vendor'));
+        if ( ! current_user_can( 'edit_users' ) ) {
+            wp_die(__('Sorry, you cannot update vendors', 'dc-woocommerce-multi-vendor'));
+        }
 
         $id = isset($_POST['id']) ? absint($_POST['id']) : 0;
         $type = isset($_POST['type']) ? wc_clean($_POST['type']) : '' ;
@@ -1415,10 +1440,12 @@ class WCMp_Ajax {
      * @return void
      */
     function woocommerce_json_search_vendors() {
-        global $WCMp;
-
-        //check_ajax_referer( 'search-vendors', 'security' );
-
+        $nonce = isset($_GET["security"]) ? wc_clean($_GET["security"]) : '';
+        if (!wp_verify_nonce($nonce, 'search-products'))
+            wp_die(__('Invalid request', 'dc-woocommerce-multi-vendor'));
+        if ( ! current_user_can( 'edit_users' ) ) {
+            wp_die(__('Sorry, you cannot update vendors', 'dc-woocommerce-multi-vendor'));
+        }
         header('Content-Type: application/json; charset=utf-8');
 
         $term = urldecode(stripslashes(strip_tags($_GET['term'])));
@@ -1458,6 +1485,12 @@ class WCMp_Ajax {
      * @return void
      */
     function activate_pending_vendor() {
+        $nonce = isset($_REQUEST["nonce"]) ? wc_clean($_REQUEST["nonce"]) : '';
+        if (!wp_verify_nonce($nonce, 'wcmp-vendors'))
+            wp_die(__('Invalid request', 'dc-woocommerce-multi-vendor'));
+        if ( ! current_user_can( 'edit_users' ) ) {
+            wp_die(__('Sorry, you cannot update vendors', 'dc-woocommerce-multi-vendor'));
+        }
         $user_id = filter_input(INPUT_POST, 'user_id');
         $redirect = filter_input(INPUT_POST, 'redirect');
         $custom_note = filter_input(INPUT_POST, 'custom_note');
@@ -1490,6 +1523,12 @@ class WCMp_Ajax {
      * @return void
      */
     function reject_pending_vendor() {
+        $nonce = isset($_REQUEST["nonce"]) ? wc_clean($_REQUEST["nonce"]) : '';
+        if (!wp_verify_nonce($nonce, 'wcmp-vendors'))
+            wp_die(__('Invalid request', 'dc-woocommerce-multi-vendor'));
+        if ( ! current_user_can( 'edit_users' ) ) {
+            wp_die(__('Sorry, you cannot update vendors', 'dc-woocommerce-multi-vendor'));
+        }
         $user_id = filter_input(INPUT_POST, 'user_id');
         $redirect = filter_input(INPUT_POST, 'redirect');
         $custom_note = filter_input(INPUT_POST, 'custom_note');
@@ -1519,6 +1558,12 @@ class WCMp_Ajax {
      * @return void
      */
     function wcmp_suspend_vendor() {
+        $nonce = isset($_REQUEST["nonce"]) ? wc_clean($_REQUEST["nonce"]) : '';
+        if (!wp_verify_nonce($nonce, 'wcmp-vendors'))
+            wp_die(__('Invalid request', 'dc-woocommerce-multi-vendor'));
+        if ( ! current_user_can( 'edit_users' ) ) {
+            wp_die(__('Sorry, you cannot update vendors', 'dc-woocommerce-multi-vendor'));
+        }
         $user_id = filter_input(INPUT_POST, 'user_id');
         $redirect = filter_input(INPUT_POST, 'redirect');
         if ($user_id) {
@@ -1542,6 +1587,12 @@ class WCMp_Ajax {
      * @return void
      */
     function wcmp_activate_vendor() {
+        $nonce = isset($_REQUEST["nonce"]) ? wc_clean($_REQUEST["nonce"]) : '';
+        if (!wp_verify_nonce($nonce, 'wcmp-vendors'))
+            wp_die(__('Invalid request', 'dc-woocommerce-multi-vendor'));
+        if ( ! current_user_can( 'edit_users' ) ) {
+            wp_die(__('Sorry, you cannot update vendors', 'dc-woocommerce-multi-vendor'));
+        }
         $user_id = filter_input(INPUT_POST, 'user_id');
         $redirect = filter_input(INPUT_POST, 'redirect');
         if ($user_id) {
@@ -1723,8 +1774,8 @@ class WCMp_Ajax {
     }
 
     public function delete_fpm_product() {
-
-        $proid = isset($_POST['proid']) ? wc_clean($_POST['proid']) : 0;
+        check_ajax_referer('wcmp-frontend', 'security');
+        $proid = isset($_POST['proid']) ? absint($_POST['proid']) : 0;
         if ($proid) {
             if (wp_delete_post($proid)) {
                 //echo 'success';
@@ -1754,6 +1805,7 @@ class WCMp_Ajax {
 
     public function wcmp_vendor_product_list() {
         global $WCMp;
+        check_ajax_referer('wcmp-product', 'security');
         if (is_user_logged_in() && is_user_wcmp_vendor(get_current_user_id())) {
             $vendor = get_current_vendor();
             $enable_ordering = apply_filters('wcmp_vendor_dashboard_product_list_table_orderable_columns', array('name', 'date'));
@@ -2049,6 +2101,7 @@ class WCMp_Ajax {
 
     public function wcmp_vendor_unpaid_order_vendor_withdrawal_list() {
         global $WCMp;
+        check_ajax_referer('wcmp-withdrawal', 'security');
         if (is_user_logged_in() && is_user_wcmp_vendor(get_current_vendor_id())) {
             $vendor = get_wcmp_vendor(get_current_vendor_id());
             $requestData = ( $_REQUEST ) ? wc_clean( $_REQUEST ) : array();
@@ -2124,6 +2177,7 @@ class WCMp_Ajax {
     }
 
     public function wcmp_vendor_coupon_list() {
+        check_ajax_referer('wcmp-coupon', 'security');
         if (is_user_logged_in() && is_user_wcmp_vendor(get_current_vendor_id())) {
             $vendor = get_wcmp_vendor(get_current_vendor_id());
             $requestData = ( $_REQUEST ) ? wc_clean( $_REQUEST ) : array();
@@ -2225,6 +2279,7 @@ class WCMp_Ajax {
 
     public function wcmp_vendor_transactions_list() {
         global $WCMp;
+        check_ajax_referer('wcmp-transaction', 'security');
         if (is_user_logged_in() && is_user_wcmp_vendor(get_current_vendor_id())) {
             $vendor = get_wcmp_vendor(get_current_vendor_id());
             $requestData = ( $_REQUEST ) ? wc_clean( $_REQUEST ) : array();
@@ -2757,6 +2812,7 @@ class WCMp_Ajax {
 
     public function wcmp_question_verification_approval() {
         global $WCMp;
+        check_ajax_referer('wcmp-vendors', 'security');
         $data = array();
         if (!empty($_POST['question_id'])) {
             $question_id = isset($_POST['question_id']) ? absint($_POST['question_id']) : 0;
@@ -2779,8 +2835,8 @@ class WCMp_Ajax {
     }
 
     function wcmp_get_vendor_details() {
+        check_ajax_referer('wcmp-vendors', 'security');
         global $WCMp;
-
         if (!isset($_GET['vendor_id'])) {
             wp_die(__('No Vendor ID found', 'dc-woocommerce-multi-vendor'));
         }
@@ -2967,6 +3023,7 @@ class WCMp_Ajax {
      * @since 3.0.6
      */
     function wcmp_product_tag_add() {
+        check_ajax_referer('add-attribute', 'security');
         $taxonomy = apply_filters('wcmp_product_tag_add_taxonomy', 'product_tag');
         $tax = get_taxonomy($taxonomy);
         $tag_name = '';
@@ -2993,8 +3050,8 @@ class WCMp_Ajax {
     }
 
     function wcmp_widget_vendor_pending_shipping() {
+        check_ajax_referer('wcmp-pending-shipping', 'security');
         if (is_user_logged_in() && is_user_wcmp_vendor(get_current_vendor_id())) {
-
             $vendor = get_wcmp_vendor(get_current_vendor_id());
             $requestData = ( $_REQUEST ) ? wc_clean( $_REQUEST ) : array();
             $today = @date('Y-m-d 00:00:00', strtotime("+1 days"));
@@ -3065,7 +3122,7 @@ class WCMp_Ajax {
     }
 
     function wcmp_widget_vendor_product_sales_report() {
-        global $wpdb;
+        check_ajax_referer('wcmp-sales', 'security');
         if (is_user_logged_in() && is_user_wcmp_vendor(get_current_vendor_id())) {
 
             $vendor = get_wcmp_vendor(get_current_vendor_id());
@@ -3511,6 +3568,7 @@ class WCMp_Ajax {
     }
 
     public function wcmp_add_shipping_method() {
+        check_ajax_referer('wcmp-shipping', 'security');
         global $WCMp;
         $data = array(
             'zone_id' => wc_clean($_POST['zoneID']),
@@ -3529,6 +3587,7 @@ class WCMp_Ajax {
     }
 
     public function wcmp_update_shipping_method() {
+        check_ajax_referer('wcmp-shipping', 'security');
         global $WCMp;
         $args = isset($_POST['args']) ? wc_clean($_POST['args']) : '';
         $posted_data = isset($_POST['posted_data']) ? array_filter(wc_clean($_POST['posted_data'])) : array();
@@ -3567,6 +3626,7 @@ class WCMp_Ajax {
     }
 
     public function wcmp_delete_shipping_method() {
+        check_ajax_referer('wcmp-shipping', 'security');
         global $WCMp;
         $data = array(
             'zone_id' => wc_clean($_POST['zoneID']),
@@ -3587,6 +3647,7 @@ class WCMp_Ajax {
     }
 
     public function wcmp_toggle_shipping_method() {
+        check_ajax_referer('wcmp-shipping', 'security');
         global $WCMp;
         $data = array(
             'instance_id' => wc_clean($_POST['instance_id']),
@@ -3605,6 +3666,7 @@ class WCMp_Ajax {
     }
     
     public function wcmp_configure_shipping_method() {
+        check_ajax_referer('wcmp-shipping', 'security');
         global $WCMp;
         $zone_id = isset($_POST['zoneId']) ? absint($_POST['zoneId']) : 0;
         $method_id = isset($_POST['methodId']) ? wc_clean($_POST['methodId']) : '';
@@ -3747,6 +3809,7 @@ class WCMp_Ajax {
     }
     
     public function wcmp_vendor_configure_shipping_method() {
+        check_ajax_referer('wcmp-shipping', 'security');
         global $WCMp;
         $zone_id = isset($_POST['zoneId']) ? absint($_POST['zoneId']) : 0;
         $method_id = isset($_POST['methodId']) ? wc_clean($_POST['methodId']) : '';
@@ -4071,9 +4134,10 @@ class WCMp_Ajax {
     public function wcmp_do_refund() {
         ob_start();
         global $WCMp;
-
         check_ajax_referer('wcmp-order-item', 'security');
-        
+        if ( ! current_user_can( 'edit_shop_orders' ) ) {
+            wp_die( -1 );
+        }
         $order_id = isset($_POST['order_id']) ? absint($_POST['order_id']) : 0;
         $refund_amount = wc_format_decimal(sanitize_text_field(wp_unslash($_POST['refund_amount'])), wc_get_price_decimals());
         $refunded_amount = wc_format_decimal(sanitize_text_field(wp_unslash($_POST['refunded_amount'])), wc_get_price_decimals());
@@ -4340,6 +4404,10 @@ class WCMp_Ajax {
     }
     
     public function wcmp_order_status_changed() {
+        check_ajax_referer('grant-access', 'security');
+        if (!current_user_can('edit_shop_orders')) {
+            wp_die(-1);
+        }
         $order_id = isset( $_POST['order_id'] ) ? absint($_POST['order_id']) : 0;
         $selected_status = isset( $_POST['selected_status'] ) ? wc_clean($_POST['selected_status']) : '';
         $order = wc_get_order( $order_id );
@@ -4353,6 +4421,7 @@ class WCMp_Ajax {
     }
     
     public function wcmp_vendor_banking_ledger_list() {
+        check_ajax_referer('wcmp-ledger', 'security');
         global $WCMp;
         if (is_user_logged_in() && is_user_wcmp_vendor(get_current_vendor_id())) {
             $vendor = get_wcmp_vendor(get_current_vendor_id());
@@ -4428,11 +4497,12 @@ class WCMp_Ajax {
      * @return string
      */
     function wpml_wcmp_product_translations() {
+        check_ajax_referer('wcmp-dashboard', 'security');
         global $sitepress, $wpml_post_translations, $_POST, $WCMp;
         
         $translation_html = '';
         if ( isset( $_POST['proid'] ) && !empty( $_POST['proid'] ) ) {
-            $product_id = $_POST['proid'];
+            $product_id = absint($_POST['proid']);
             if ( $product_id ) {
                 $active_languages = $WCMp->frontend->get_filtered_active_lanugages();
                 if ( count( $active_languages ) <= 1 ) {
@@ -4467,6 +4537,7 @@ class WCMp_Ajax {
     }
 
     function wpml_wcmp_product_new_translation() {
+        check_ajax_referer('wcmp-dashboard', 'security');
         global $sitepress, $wpml_post_translations, $_POST, $wpdb;
         if ( isset( $_POST['proid'] ) && !empty( $_POST['proid'] ) ) {
             $product_id = absint($_POST['proid']);
@@ -4578,6 +4649,7 @@ class WCMp_Ajax {
     }
 
     public function wcmp_follow_store_toggle_status() {
+        check_ajax_referer('wcmp-frontend', 'nonce');
         $store_vendor_id = isset( $_POST['vendor_id'] ) ? absint($_POST['vendor_id']) : 0;
         $follow_status = isset( $_POST['status'] ) ? wc_clean($_POST['status']) : '';
         $current_user_id = get_current_user_id() ? absint(get_current_user_id()) : 0;
@@ -4636,6 +4708,10 @@ class WCMp_Ajax {
     }
 
     public function commission_variation() {
+        if ( ! current_user_can( 'edit_users' ) ) {
+            wp_die(__('Sorry, you cannot update', 'dc-woocommerce-multi-vendor'));
+        }
+        check_ajax_referer('wcmp-vendors', 'nonce');
         $setting_from_sanitize = isset($_POST['wcmp_settings_form']) ? wp_unslash($_POST['wcmp_settings_form']) : '';
         parse_str($setting_from_sanitize, $wcmp_settings_form);
         if ( isset( $wcmp_settings_form['vendor_commission_by_products'] ) ) {
@@ -4649,6 +4725,10 @@ class WCMp_Ajax {
     }
 
     public function admin_review_setting() {
+        if ( ! current_user_can( 'edit_users' ) ) {
+            wp_die(__('Sorry, you cannot update', 'dc-woocommerce-multi-vendor'));
+        }
+        check_ajax_referer('wcmp-vendors', 'nonce');
         $setting_from_sanitize = isset($_POST['wcmp_review_settings_form']) ? wp_unslash($_POST['wcmp_review_settings_form']) : '';
         parse_str($setting_from_sanitize, $wcmp_review_settings_form);
 
@@ -4680,6 +4760,7 @@ class WCMp_Ajax {
 
     // Update vendor shipping zone order
     public function wcmp_vendor_zone_shipping_order() {
+        check_ajax_referer('wcmp-shipping-zone', 'security');
         $array_items = array();
         foreach (explode("&", $_POST['data_detail']) as $value) {
             $array_items[] = (int) str_replace("item[]=","",$value);

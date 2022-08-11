@@ -337,7 +337,7 @@ class WCMp_Vendor_Hooks {
         $suffix = defined( 'WCMP_SCRIPT_DEBUG' ) && WCMP_SCRIPT_DEBUG ? '' : '.min';
         wp_enqueue_script( 'jquery-ui-accordion' );
         wp_enqueue_script( 'wcmp_new_vandor_announcements_js', $frontend_script_path . 'wcmp_vendor_announcements' . $suffix . '.js', array( 'jquery' ), $WCMp->version, true );
-        $WCMp->localize_script( 'wcmp_new_vandor_announcements_js' );
+        $WCMp->localize_script( 'wcmp_new_vandor_announcements_js', array('grant_access_nonce' => wp_create_nonce( 'grant-access' ) ) );
         $vendor = get_wcmp_vendor( get_current_vendor_id() );
         $WCMp->template->get_template( 'vendor-dashboard/vendor-announcements.php', array( 'vendor_announcements' => $vendor->get_announcements() ) );
     }

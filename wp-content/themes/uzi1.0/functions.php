@@ -143,68 +143,17 @@ function uzi_scripts() {
     wp_enqueue_script( 'jquery' );
 
     wp_enqueue_style( 'uzi-main-css', get_template_directory_uri() . '/assets/css/main.css', array(), _S_VERSION );
-//    wp_enqueue_style( 'bpsd-slick-css', get_template_directory_uri() . '/assets/lib/slick/slick.css', array(), _S_VERSION );
 
-//    wp_enqueue_script('validator-js', get_template_directory_uri() . '/assets/lib/validator-js/jquery.validate.min.js', array(), _S_VERSION, true);
-//    wp_enqueue_script( 'bpsd-slick-js', get_template_directory_uri() . '/assets/lib/slick/slick.min.js', array('jquery'), _S_VERSION, true );
     wp_enqueue_script( 'uzi-main-js', get_template_directory_uri() . '/assets/js/app.js', array('jquery'), _S_VERSION, true );
+    wp_enqueue_script( 'uzi-product-js', get_template_directory_uri() . '/assets/js/product.js', array('jquery'), _S_VERSION, true );
 
-//    wp_enqueue_script( 'bpsd-cart-js', get_template_directory_uri() . '/assets/js/cart.js', array('jquery'), _S_VERSION, true );
-
-//    wp_enqueue_script( 'stripe', 'https://js.stripe.com/v3/', '', '3.0', true );
-
-    /*if(is_product()){
-        wp_enqueue_script( 'bpsd-product-js', get_template_directory_uri() . '/assets/js/product.js', array('jquery','validator-js'), _S_VERSION, true );
-
-        if(wc_get_product(get_the_ID())->is_type( 'variable' ) ):
-//            wp_localize_script( 'bpsd-product-js', 'ajax_url',
-//                array(
-//                    'url' => admin_url('admin-ajax.php'),
-//                    'variations'=> json_encode(wc_get_product(get_the_ID())->get_available_variations()),
-//                    'default_price'=>wc_get_product(get_the_ID())->get_variation_price( 'min' )
-//                )
-//
-//            );
-        else:
-            wp_localize_script( 'bpsd-product-js', 'ajax_url',
-                array(
-                    'url' => admin_url('admin-ajax.php')
-                )
-            );
-        endif;
-
-        if (wc_get_product(get_the_ID())->get_category_ids()):
-            $table = get_field('discount_table', 'product_cat_' . wc_get_product(get_the_ID())->get_category_ids()[0]);
-            if ($table):
-                wp_localize_script('bpsd-product-js', 'discount',
-                    array(
-                        'data' =>  $table
-                    )
-                );
-            endif;
-            $table = get_field('add_dop_price', 'product_cat_' . wc_get_product(get_the_ID())->get_category_ids()[0]);
-            if ($table):
-                wp_localize_script('bpsd-product-js', 'add_dop_price',
-                    array(
-                        'data' =>  array_map('array_mb_replace', $table)
-                    )
-                );
-            endif;
-        endif;
-
-    }
-
-    add_action( 'wp_enqueue_scripts', 'myajax_data', 99 );
-    function myajax_data(){
-
-        wp_localize_script( 'bpsd-main-js', 'ajax_data',
+    if(is_product()){
+        wp_localize_script( 'uzi-product-js', 'ajax_url',
             array(
                 'url' => admin_url('admin-ajax.php')
             )
         );
-
-    }*/
-
+    }
 }
 add_action( 'wp_enqueue_scripts', 'uzi_scripts' );
 
@@ -243,20 +192,6 @@ require get_template_directory() . '/inc/pagination.php';
 require get_template_directory() . '/inc/product-admin.php';
 require get_template_directory() . '/inc/product-review.php';
 //require get_template_directory() . '/inc/cart.php';
-
-
-// ACF Option fields
-if( function_exists('acf_add_options_page') ) {
-
-    acf_add_options_page(array(
-        'page_title' 	=> 'General options',
-        'menu_title'	=> 'General options',
-        'menu_slug' 	=> 'general_options',
-        'capability'	=> 'edit_posts',
-        'redirect'		=> false
-    ));
-
-}
 
 function mytheme_add_woocommerce_support() {
     add_theme_support( 'woocommerce' );
@@ -670,8 +605,8 @@ function wcpdf_a6_packing_slips($paper_format, $template_type) {
 
 //Add page with custom fields
 acf_add_options_page(array(
-    'page_title' => 'General options',
-    'menu_title' => 'General options',
+    'page_title' => 'Основные настройки',
+    'menu_title' => 'Основные настройки',
     'menu_slug' => 'general_options',
     'capability' => 'edit_posts',
     'redirect' => false
@@ -684,6 +619,8 @@ function add_custom_class_to_menu_item($classes, $item, $args)
         $classes[] = 'header__nav_item';
     } elseif ('Sub menu' === $args->menu) {
         $classes[] = '';
+    } elseif ('Menu 404' === $args->menu) {
+        $classes[] = 'notfound__body_item';
     }
 
     return $classes;

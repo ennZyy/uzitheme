@@ -1,5 +1,10 @@
 <?php
 $product = wc_get_product();
+$attributes = $product->get_attributes();
+
+//echo '<pre>';
+//print_r($attributes);
+//echo '</pre>';
 ?>
 <a href="<?php the_permalink(); ?>" class="list__body_items_item card">
     <div class="card__img">
@@ -24,6 +29,9 @@ $product = wc_get_product();
                         от <?php echo $product->get_regular_price() . get_woocommerce_currency_symbol( $currency = '' ); ?>
                     </div>
                 <?php endif; ?>
+                <div class="values__cnt">
+                    9/10
+                </div>
             </div>
             <div class="link">
                 <div>Подробнее</div>
@@ -35,11 +43,20 @@ $product = wc_get_product();
             </div>
             <ul class="list">
                 <?php
-                $categories = get_the_terms( $product->get_id(), 'product_cat' );
+                foreach ( $attributes as $attribute_item ):
+                    foreach (wc_get_product_terms( $product->get_id(), $attribute_item->get_data()['name'], array( 'taxonomy' =>  'sensor-frequencies' ) ) as $value): ?>
+                        <?php
+                            if ( $value->taxonomy === 'pa_application-area' ):
+                                echo '<li class="list__item">— ' . $value->name . '</li>';
+                            endif;
 
-                foreach ($categories as $category) : ?>
-                    <li class="list__item">— <?= $category->name ?></li>
-                <?php endforeach; ?>
+                            if ( $value->taxonomy === 'pa_suitable-device' && is_product_category(48) ) {
+                                echo '<li class="list__item">— ' . $value->name . '</li>';
+                            }
+
+                        ?>
+                    <?php endforeach;
+                endforeach; ?>
             </ul>
             <div class="action">
                 <button>

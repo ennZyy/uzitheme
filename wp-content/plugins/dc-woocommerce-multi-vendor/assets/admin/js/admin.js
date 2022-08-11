@@ -11,7 +11,8 @@ jQuery(document).ready(function ($) {
             question_type : question_type,
             question_id : question_id,
             data_action : data_action,
-            product      : product
+            product      : product,
+            security: wcmp_admin_js_script_data.vendors_nonce
         }   
         $.post(ajaxurl, data, function(response) {
             location.reload();
@@ -692,7 +693,7 @@ jQuery(document).ready(function ($) {
                 data:    {
                     vendor_id: $vendor_id,
                     action  : 'wcmp_get_vendor_details',
-                    nonce: wcmp_admin_js_script_data.vendors_nonce
+                    security: wcmp_admin_js_script_data.vendors_nonce
                 },
                 type:    'GET',
                 success: function( response ) {
@@ -728,7 +729,8 @@ jQuery(document).ready(function ($) {
                     action : $vendor_action,
                     redirect: true,
                     custom_note: $pending_vendor_note,
-                    note_by: $note_author_id
+                    note_by: $note_author_id,
+                    nonce: wcmp_admin_js_script_data.vendors_nonce
                 },
                 type: 'POST',
                 success: function( response ) {
@@ -772,6 +774,7 @@ jQuery(document).ready(function ($) {
             data:    {
                 action: 'commission_variation',
                 wcmp_settings_form   : $('.wcmp_vendors_settings').serialize(),
+                nonce: wcmp_admin_js_script_data.vendors_nonce
             },
             type:    'POST',
             success: function( response ) {
@@ -792,6 +795,7 @@ jQuery(document).ready(function ($) {
             data:    {
                 action: 'admin_review_setting',
                 wcmp_review_settings_form   : $('.wcmp_vendors_settings').serialize(),
+                nonce: wcmp_admin_js_script_data.vendors_nonce
             },
             type:    'POST',
             success: function( response ) {

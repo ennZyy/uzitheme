@@ -1,4 +1,5 @@
-<div id='ajaxsearchliteres<?php echo $id; ?>' class='<?php echo $style['resultstype']; ?> wpdreams_asl_results asl_w asl_r asl_r_<?php echo $real_id; ?>'>
+<div id='ajaxsearchliteres<?php echo $id; ?>'
+	 class='<?php echo $style['resultstype']; ?> wpdreams_asl_results asl_w asl_r asl_r_<?php echo $real_id; ?> asl_r_<?php echo $real_id; ?>_1'>
 
 	<?php do_action('asl_layout_before_results', $id); ?>
 

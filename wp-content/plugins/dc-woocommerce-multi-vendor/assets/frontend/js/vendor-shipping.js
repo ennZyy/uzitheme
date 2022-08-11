@@ -64,6 +64,7 @@
                 data: {
                     action: 'wcmp-get-shipping-methods-by-zone',
                     zoneID: zoneID,
+                    security: wcmp_vendor_shipping_script_data.nonce
                 },
                 success: function (response) {
                     $(appObj.vendor_shipping_methods).html(response.data.html).show();
@@ -117,6 +118,7 @@
                     action: 'wcmp-add-shipping-method',
                     zoneID: zoneId,
                     method: shippingMethod,
+                    security: wcmp_vendor_shipping_script_data.nonce
                 };
 
                 $('#wcmp_shipping_method_add_button').block({
@@ -163,6 +165,7 @@
                     zoneId: zoneId,
                     instanceId: instanceId,
                     methodId: methodId,
+                    security: wcmp_vendor_shipping_script_data.nonce
                 };
                 
             var ajaxRequest = $.ajax({
@@ -194,6 +197,7 @@
                     data = {
                         action: 'wcmp-update-shipping-method',
                         zoneID: zoneId,
+                        security: wcmp_vendor_shipping_script_data.nonce,
                         args: {
                             instance_id: instanceId,
                             zone_id: zoneId,
@@ -238,6 +242,7 @@
                     action: 'wcmp-delete-shipping-method',
                     zoneID: zoneId,
                     instance_id: instance_id,
+                    security: wcmp_vendor_shipping_script_data.nonce
                 };
 
                 if (zoneId == '') {
@@ -286,6 +291,7 @@
                 zoneID: zoneId,
                 instance_id: value,
                 checked: checked,
+                security: wcmp_vendor_shipping_script_data.nonce
             };
 
             if (zoneId == '') {

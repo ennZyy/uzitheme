@@ -129,7 +129,8 @@ class WCMp_Report_Vendor extends WC_Admin_Report {
             wp_localize_script('wcmp_report_js', 'wcmp_report_vendor', array(
                 'total_sales_arr' => $total_sales,
                 'start_date' => $start_date,
-                'end_date' => $end_date
+                'end_date' => $end_date,
+                'security'  =>  wp_create_nonce('wcmp-report')
             ));
 
             $chart_arr = $html_chart = '';

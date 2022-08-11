@@ -49,7 +49,8 @@ jQuery(document).ready(function($){
 		var data = {
 			action : 'wcmp_vendor_announcements_operation',
 			actionmode : 'mark_delete',
-			msg_id : msg_id			
+			msg_id : msg_id,
+			security: wcmp_new_vandor_announcements_js_script_data.grant_access_nonce			
 		}
 		$.post(wcmp_new_vandor_announcements_js_script_data.ajax_url, data, function(res) {			
 			if(	res == 1 ) {
@@ -100,7 +101,8 @@ jQuery(document).ready(function($){
 		var data = {
 			action : 'wcmp_vendor_announcements_operation',
 			actionmode : 'mark_read',
-			msg_id : msg_id			
+			msg_id : msg_id,
+			security: wcmp_new_vandor_announcements_js_script_data.grant_access_nonce			
 		}
 		$.post(wcmp_new_vandor_announcements_js_script_data.ajax_url, data, function(res) {			
 			if(	res != 0 ) {
@@ -124,7 +126,8 @@ jQuery(document).ready(function($){
 		var data = {
 			action : 'wcmp_vendor_announcements_operation',
 			actionmode : 'mark_unread',
-			msg_id : msg_id			
+			msg_id : msg_id,
+			security: wcmp_new_vandor_announcements_js_script_data.grant_access_nonce	
 		}
 		$.post(wcmp_new_vandor_announcements_js_script_data.ajax_url, data, function(res) {				
 			if(	res != 0 ) {
@@ -153,7 +156,8 @@ jQuery(document).ready(function($){
 		var data = {
 			action : 'wcmp_vendor_announcements_operation',
 			actionmode : 'mark_unread',
-			msg_id : msg_id			
+			msg_id : msg_id,
+			security: wcmp_new_vandor_announcements_js_script_data.grant_access_nonce			
 		}
 		$.post(wcmp_new_vandor_announcements_js_script_data.ajax_url, data, function(res) {				
 			if(	res != 0 ) {
@@ -196,7 +200,8 @@ jQuery(document).ready(function($){
 		var data = {
 			action : 'wcmp_vendor_announcements_operation',
 			actionmode : 'mark_read',
-			msg_id : msg_id			
+			msg_id : msg_id,
+			security: wcmp_new_vandor_announcements_js_script_data.grant_access_nonce			
 		}
 		$.post(wcmp_new_vandor_announcements_js_script_data.ajax_url, data, function(res) {			
 			if(	res != 0 ) {
@@ -240,7 +245,8 @@ jQuery(document).ready(function($){
 		var data = {
 			action : 'wcmp_vendor_announcements_operation',
 			actionmode : 'mark_restore',
-			msg_id : msg_id			
+			msg_id : msg_id,
+			security: wcmp_new_vandor_announcements_js_script_data.grant_access_nonce			
 		}
 		$.post(wcmp_new_vandor_announcements_js_script_data.ajax_url, data, function(res) {			
 			if(	res != 0 ) {

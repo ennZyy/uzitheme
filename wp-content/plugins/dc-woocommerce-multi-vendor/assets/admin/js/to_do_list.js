@@ -3,9 +3,10 @@ jQuery(document).ready(function($) {
 		 e.preventDefault();
 		 var data = {
 				action : 'activate_pending_vendor',
-				user_id : $(this).attr('data-id')
+				user_id : $(this).attr('data-id'),
+				nonce : dc_to_do_list_js_script_data.admin_nonce
 		 }	
-		 $.post(ajaxurl, data, function(responsee) {
+		 $.post(dc_to_do_list_js_script_data.ajax_url, data, function(responsee) {
 		 		 window.location= window.location ;
 		 });
 	});
@@ -14,9 +15,10 @@ jQuery(document).ready(function($) {
 		 e.preventDefault();
 		 var data = {
 				action : 'reject_pending_vendor',
-				user_id : $(this).attr('data-id')
+				user_id : $(this).attr('data-id'),
+				nonce : dc_to_do_list_js_script_data.admin_nonce
 		 }
-		 $.post(ajaxurl, data, function(responsee) {
+		 $.post(dc_to_do_list_js_script_data.ajax_url, data, function(responsee) {
 		 		 window.location= window.location ;
 		 });
 	});
@@ -31,9 +33,10 @@ jQuery(document).ready(function($) {
 				id : id,
 				type: $(this).attr('data-type'),
 				reason : reason,
+				nonce : dc_to_do_list_js_script_data.admin_nonce
 		}
 		
-		$.post(ajaxurl, data, function(responsee) {
+		$.post(dc_to_do_list_js_script_data.ajax_url, data, function(responsee) {
 			if (data_type == 'user' || data_type == 'shop_coupon' || data_type == 'product' || data_type == 'dc_commission') {
 				window.location = window.location;
 			} else {} 		 
@@ -45,9 +48,10 @@ jQuery(document).ready(function($) {
 		 var data = {
 				action : 'transaction_done_button',
 				trans_id : $(this).attr('data-transid'),
-				vendor_id : $(this).attr('data-vendorid')
+				vendor_id : $(this).attr('data-vendorid'),
+				nonce : dc_to_do_list_js_script_data.admin_nonce
 		 }	
-		 $.post(ajaxurl, data, function(responsee) {
+		 $.post(dc_to_do_list_js_script_data.ajax_url, data, function(responsee) {
 		 		 window.location = window.location ;
 		 });
 	});

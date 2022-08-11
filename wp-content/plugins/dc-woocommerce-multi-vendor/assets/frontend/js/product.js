@@ -496,7 +496,8 @@ var wcmpAfmProductEditor = ( function ( $ ) {
                 if ( isNew.length ) {
                     var data = {
                         action: 'wcmp_product_tag_add',
-                        new_tag: isNew.val()
+                        new_tag: isNew.val(),
+                        security: wcmp_advance_product_params.add_attribute_nonce
                     };
                     $.ajax( {
                         type: 'POST',

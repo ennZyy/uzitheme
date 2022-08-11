@@ -107,12 +107,6 @@
         };
         $.post(wcmp_customer_qna_js_script_data.ajax_url, data, function (response) {
             if (response.no_data == 0) {
-//                $('#reply-item-'+key).hide();
-//                if(response.remain_data == 0){
-//                    $('.customer-questions-panel').html('');
-//                    $('.customer-questions-panel').html(response.msg);
-//                }
-//                setTimeout($('#qna-reply-modal-'+key).modal('hide'),3000);
                 window.location.reload();
             }
         });
@@ -131,7 +125,8 @@
             question_type : question_type,
             question_id : question_id,
             data_action : data_action,
-            product     : product
+            product     : product,
+            security     : wcmp_customer_qna_js_script_data.vendors_nonce
         }   
         $.post(wcmp_customer_qna_js_script_data.ajax_url, data, function(response) {
             window.location.reload();
@@ -152,12 +147,6 @@
         };
         $.post(wcmp_customer_qna_js_script_data.ajax_url, data, function (response) {
             if (response.no_data == 0) {
-//                $('#reply-item-'+key).hide();
-//                if(response.remain_data == 0){
-//                    $('.customer-questions-panel').html('');
-//                    $('.customer-questions-panel').html(response.msg);
-//                }
-//                setTimeout($('#qna-reply-modal-'+key).modal('hide'),3000);
                 window.location.reload();
             }
         });

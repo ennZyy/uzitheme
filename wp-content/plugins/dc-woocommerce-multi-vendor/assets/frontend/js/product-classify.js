@@ -252,6 +252,7 @@
             var $_this = $( this );
             var data = {
                 action: 'wcmp_create_duplicate_product',
+                nonce: wcmp_product_classify_script_data.types_nonce,
                 product_id: $product_id
             };
             // Make ajax call.
@@ -393,6 +394,7 @@
         var product_id = $(this).data('product_id');
         var data = {
             action: 'wcmp_create_duplicate_product',
+            nonce: wcmp_product_classify_script_data.types_nonce,
             product_id: product_id
         };
         $.post(wcmp_product_classify_script_data.ajax_url, data, function (response) {

@@ -38,6 +38,7 @@ jQuery(document).ready(function ($) {
                 var vendor_id = $('#wcmp_vendor_reviews #respond #wcmp_vendor_for_rating').val();
                 var data = {
                     action: 'wcmp_add_review_rating_vendor',
+                    nonce: wcmp_seller_review_rating_js_script_data.review_nonce,
                     rating: rating,
                     comment: comment,
                     vendor_id: $('#wcmp_vendor_for_rating').val(),
@@ -102,6 +103,7 @@ jQuery(document).ready(function ($) {
         }
         var data = {
             action: 'wcmp_add_review_rating_vendor',
+            nonce: wcmp_seller_review_rating_js_script_data.review_nonce,
             comment: comment,
             vendor_id: vendor_id,
             comment_parent : comment_id

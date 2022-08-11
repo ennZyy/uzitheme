@@ -821,7 +821,7 @@ if (!class_exists('WCMp_WP_Fields')) {
             $field['label_holder_class'] = isset($field['label_holder_class']) ? ($field['label_holder_class'] . ' ' . $field['id'] . '_label_holder') : ($field['id'] . '_label_holder');
             $field['label_for'] = isset($field['label_for']) ? ($field['label_for'] . ' ' . $field['id']) : $field['id'];
             $field['label_class'] = isset($field['label_class']) ? ($field['label_for'] . ' ' . $field['label_class']) : $field['label_for'];
-            if (!isset($field['in_table']))
+            if (!isset($field['in_table']) && $field['type'] != 'upload' )
             printf(
                 '<fieldset class="%s">', $field['wrapper_class']
             );
@@ -944,7 +944,7 @@ if (!class_exists('WCMp_WP_Fields')) {
 
             do_action('afet_field_wrapper_' . $field['id']);
             do_action('after_field_wrapper');
-            if (!isset($field['in_table']))
+            if (!isset($field['in_table']) && $field['type'] != 'upload')
                 echo '</fieldset>';
         }
 

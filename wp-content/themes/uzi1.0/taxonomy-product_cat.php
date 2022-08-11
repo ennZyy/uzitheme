@@ -279,18 +279,9 @@ get_header();
                         </div>
                         <div class="list__body_items">
                             <?php
-                            $featured = new WP_Query(array(
-                                'post_type' => 'product',
-                                'post_status' => 'publish',
-                                'ignore_sticky_posts' => 1,
-                                'posts_per_page' => -1,
-                                'orderby' => 'name',
-                                'order' => 'ASC',
-                                'post__in' => wc_get_featured_product_ids()
-                            ));
-                            if($featured->have_posts()):
-                                while ($featured->have_posts()) :
-                                    $featured->the_post();
+                            if($products->have_posts()):
+                                while ($products->have_posts()) :
+                                    $products->the_post();
                                     get_template_part( 'template-parts/category-product', 'card');
                             ?>
                             <?php
@@ -299,7 +290,9 @@ get_header();
                             ?>
                         </div>
                         <div class="list__body_action">
-                            <button>Показать еще</button>
+                            <?php if ( count($products->posts) > 9 ): ?>
+                                <button>Показать еще</button>
+                            <?php endif; ?>
                         </div>
                     </div>
                 </div>

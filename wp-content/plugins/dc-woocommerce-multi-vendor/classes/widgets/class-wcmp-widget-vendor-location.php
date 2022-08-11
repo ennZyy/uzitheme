@@ -84,7 +84,7 @@ class DC_Woocommerce_Store_Location_Widget extends WP_Widget {
             
             $args = array(
                 'instance' => $instance,
-                'gmaps_link' => esc_url(add_query_arg(array('q' => urlencode($location)), '//maps.google.com/')),
+                'gmaps_link' => is_array($location) ? '' : esc_url(add_query_arg(array('q' => urlencode($location)), '//maps.google.com/')),
                 'location' => $location,
                 'store_lat' => $store_lat,
                 'store_lng' => $store_lng

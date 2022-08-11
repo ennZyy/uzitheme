@@ -3,6 +3,7 @@ jQuery(document).ready(function($) {
         report_data = {
             action: "vendor_report_sort",
             sort_choosen: b,
+            security: wcmp_report_vendor.security,
             total_sales_data: wcmp_report_vendor.total_sales_arr,
         }, $.post(ajaxurl, report_data, function(b) {
             $(".sort_chart").html(b)
@@ -14,6 +15,7 @@ jQuery(document).ready(function($) {
             action: "product_report_sort",
             sort_choosen: b,
             total_sales_data: wcmp_report_product.total_sales_arr,
+            security: wcmp_report_vendor.security
         }, $.post(ajaxurl, report_data, function(b) {
             $(".product_sort_chart").html(b)
         })
@@ -58,7 +60,8 @@ jQuery(document).ready(function($) {
             action: "vendor_search",
             vendor_id: vendor_id,
             start_date: wcmp_report_vendor.start_date,
-            end_date: wcmp_report_vendor.end_date
+            end_date: wcmp_report_vendor.end_date,
+            security: wcmp_report_vendor.security,
         }, $.post(ajaxurl, selected_vendor_data, function(b) {
             $(".sort_chart").html(b), $(".report_sort").hide()
         })
@@ -67,7 +70,8 @@ jQuery(document).ready(function($) {
             action: "banking_overview_search",
             vendor_id: vendor_id,
             start_date: wcmp_report_banking.start_date,
-            end_date: wcmp_report_banking.end_date
+            end_date: wcmp_report_banking.end_date,
+            security: wcmp_report_vendor.security
         }, $.post(ajaxurl, selected_vendor_data, function(b) {
             $(".sort_banking_table").html(b), $(".report_sort").hide()
         })
@@ -109,7 +113,8 @@ jQuery(document).ready(function($) {
             product_id: product_id,
             orders: wcmp_report_product.orders,
             start_date: wcmp_report_product.start_date,
-            end_date: wcmp_report_product.end_date
+            end_date: wcmp_report_product.end_date,
+            security: wcmp_report_vendor.security
         }, $.post(ajaxurl, selected_vendor_data, function(b) {
             $(".sort_chart").html(b)
         })
@@ -117,6 +122,7 @@ jQuery(document).ready(function($) {
         commission_data = {
             action: "commission_suggestion",
             price: $(this).val(),
+            security: wcmp_report_vendor.security,
             product_id: $(".product_id").val()
         }, $.post(ajaxurl, commission_data, function(b) {
             $("._commission_price_preview").val(b)

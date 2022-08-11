@@ -9,6 +9,7 @@ jQuery(document).ready(function($) {
 		minTermLength : 1,
 		data : {
 			action : 'woocommerce_json_search_vendors',
+			security: dc_vendor_object.security
 		}
 	}, function(data) {
 
@@ -43,6 +44,7 @@ jQuery(document).ready(function($) {
 		var unassign_vendor = {
 			action: 'unassign_vendor',
 			'product_id': unassign_vendors_data.current_product_id,
+			'security': dc_vendor_object.security
 		};
 		
 		$.post( ajaxurl, unassign_vendor, function(response) {

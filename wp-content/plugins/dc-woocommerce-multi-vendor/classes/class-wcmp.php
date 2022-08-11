@@ -516,6 +516,7 @@ final class WCMp {
                         'confirm_dlt_pro' => __("Are you sure and want to delete this Product?\nYou can't undo this action ...", 'dc-woocommerce-multi-vendor'),
                         'report_abuse_msg' => __('Report has been sent', 'dc-woocommerce-multi-vendor'),
                     ),
+                    'frontend_nonce' => wp_create_nonce('wcmp-frontend')
                 );
                 break;
             
@@ -525,12 +526,15 @@ final class WCMp {
             case 'wcmp_new_vandor_announcements_js' :
                 $params = array(
                     'ajax_url' => $this->ajax_url(),
+                    'dashboard_nonce' => wp_create_nonce('wcmp-dashboard'),
+                    'vendors_nonce' => wp_create_nonce('wcmp-vendors'),
                 );
                 break;
             
             case 'wcmp_seller_review_rating_js' :
                 $params = array(
                     'ajax_url' => $this->ajax_url(),
+                    'review_nonce' => wp_create_nonce('wcmp-review'),
                     'messages' => array(
                         'rating_error_msg_txt' => __('Please rate the vendor', 'dc-woocommerce-multi-vendor'),
                         'review_error_msg_txt' => __('Please review your vendor and minimum 10 Character required', 'dc-woocommerce-multi-vendor'),
@@ -544,6 +548,7 @@ final class WCMp {
             case 'wcmp_vendor_shipping' :    
                 $params = array(
                     'ajaxurl'	=> $this->ajax_url(),
+                    'nonce' => wp_create_nonce('wcmp-shipping'),
                     'i18n' 	=> array(
 			'deleteShippingMethodConfirmation'	=> __( 'Are you absolutely sure to delete this shipping method?', 'dc-woocommerce-multi-vendor' ),
                     ),
@@ -568,7 +573,7 @@ final class WCMp {
                 break;
                 
             default:
-                $params = array('ajax_url' => $this->ajax_url());
+                $params = array('ajax_url' => $this->ajax_url(), 'types_nonce' => wp_create_nonce('wcmp-types'));
         }
         if($default && is_array($default)) $params = array_merge($default,$params);
         return apply_filters('wcmp_get_script_data', $params, $handle);

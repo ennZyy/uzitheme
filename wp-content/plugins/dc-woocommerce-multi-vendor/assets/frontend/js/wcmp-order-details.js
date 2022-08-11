@@ -114,7 +114,8 @@ jQuery(function ($) {
             var data = {
                 action: 'wcmp_order_status_changed',
                 order_id: order_id,
-                selected_status: selected_status
+                selected_status: selected_status,
+                security: wcmp_order_details_js_script_data.grant_access_nonce
             };
 
             $.post(wcmp_order_details_js_script_data.ajax_url, data, function (response) {

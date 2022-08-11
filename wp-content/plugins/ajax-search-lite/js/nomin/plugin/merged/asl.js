@@ -1928,13 +1928,13 @@ window.WPD.intervalUntilExecute = function(f, criteria, interval, maxTries) {
         },
         destroy: function () {
             let $this = this;
-            Object.keys($this.n).forEach(function(k){
-               $this.n[k].off();
+            Object.keys($this.nodes).forEach(function(k){
+               $this.nodes[k].off?.();
             });
-            $this.nodes.searchsettings.remove();
-            $this.nodes.resultsDiv.remove();
-            $this.nodes.search.remove();
-            $this.nodes.container.remove();
+            $this.n('searchsettings').remove?.();
+            $this.n('resultsDiv').remove?.();
+            $this.n('search').remove?.();
+            $this.n('container').remove?.();
             $this.documentEventHandlers.forEach(function(h){
                 $(h.node).off(h.event, h.handler);
             });

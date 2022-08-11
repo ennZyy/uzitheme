@@ -9,7 +9,7 @@
 	<div id='ajaxsearchlite<?php echo self::$instanceCount; ?>'
 		 data-id="<?php echo $real_id; ?>"
 		 data-instance="1"
-		 class="asl_w asl_m asl_m_1 asl_m_1_<?php echo $real_id; ?>">
+		 class="asl_w asl_m asl_m_<?php echo $real_id; ?> asl_m_<?php echo $real_id; ?>_1">
 		<?php
 		/******************** PROBOX INCLUDE ********************/
 		include('asl.shortcode.probox.php');

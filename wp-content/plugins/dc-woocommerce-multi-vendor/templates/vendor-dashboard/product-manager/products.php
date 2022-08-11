@@ -182,17 +182,8 @@ if ($products_table_headers) {
                 },
             },
             "drawCallback": function(settings){
-                //$( "#product_cat" ).detach();
                 $('thead tr th.select_product').removeClass('sorting_asc');
                 $('thead tr th.image').removeClass('sorting_asc');
-//                var product_cat_sel = $('<select id="product_cat" class="wcmp-filter-dtdd wcmp_filter_product_cat form-control">').appendTo("#product_table_length");
-//                product_cat_sel.append($("<option>").attr('value', '').text('<?php echo trim(__('Select a Category', 'dc-woocommerce-multi-vendor')); ?>'));
-//                $(filter_by_category_list).each(function () {
-//                    product_cat_sel.append($("<option>").attr('value', this.key).text(this.label));
-//                });
-//                if(settings.oAjaxData.product_cat){
-//                    product_cat_sel.val(settings.oAjaxData.product_cat);
-//                }
                 if(settings.json.notices.length > 0 ){
                     $('.wcmp-wrapper .notice-wrapper').html('');
                     $.each(settings.json.notices, function( index, notice ) {
@@ -213,6 +204,7 @@ if ($products_table_headers) {
                     data.product_cat = $('#product_cat').val();
                     data.bulk_action = $('#product_bulk_actions').val();
                     data.search_keyword = $('#pro_search_key').val();
+                    data.security = '<?php echo wp_create_nonce('wcmp-product'); ?>';
                 },
                 error: function(xhr, status, error) {
                     $("#product_table tbody").append('<tr class="odd"><td valign="top" colspan="<?php echo count($products_table_headers); ?>" class="dataTables_empty" style="text-align:center;">'+error+' - <a href="javascript:window.location.reload();"><?php _e('Reload', 'dc-woocommerce-multi-vendor'); ?></a></td></tr>');
@@ -225,9 +217,6 @@ if ($products_table_headers) {
             }
         });
         new $.fn.dataTable.FixedHeader( product_table );
-//        $(document).on('change', '#product_cat', function () {
-//            product_table.ajax.reload();
-//        });
         $(document).on('click', '#pro_search_btn', function () {
             product_table.ajax.reload();
         });

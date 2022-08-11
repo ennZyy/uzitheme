@@ -94,6 +94,9 @@ jQuery(document).ready(function($) {
         ajax:{
             url : '<?php echo add_query_arg( 'action', 'wcmp_widget_vendor_pending_shipping', $WCMp->ajax_url() ); ?>', 
             type: "post",
+            data: function (data) {
+                data.security = '<?php echo wp_create_nonce('wcmp-pending-shipping'); ?>';
+            },
             error: function(xhr, status, error) {
                 $("#widget_vendor_pending_shipping tbody").append('<tr class="odd"><td valign="top" colspan="<?php if(is_array($default_headers)) count($default_headers); ?>" class="dataTables_empty" style="text-align:center;">'+error+' - <a href="javascript:window.location.reload();"><?php esc_html_e('Reload', 'dc-woocommerce-multi-vendor'); ?></a></td></tr>');
                 $("#widget_vendor_pending_shipping").css("display","none");

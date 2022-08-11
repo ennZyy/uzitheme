@@ -129,7 +129,8 @@ jQuery(document).ready(function ($) {
         });
         var data = {
             action : 'delete_fpm_product',
-            proid : item.data('proid')
+            proid : item.data('proid'),
+            security       : frontend_js_script_data.frontend_nonce
         }	
         $.ajax({
             type: 'POST',
@@ -167,6 +168,7 @@ jQuery(document).ready(function ($) {
             action      : 'wcmp_follow_store_toggle_status',
             vendor_id   : vendor_id,
             status      : status,
+            nonce       : frontend_js_script_data.frontend_nonce
         }
 
         $.ajax({
