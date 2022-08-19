@@ -168,6 +168,9 @@ add_action( 'wp_ajax_nopriv_generate-password', 'wp_ajax_nopriv_generate_passwor
 
 add_action( 'wp_ajax_nopriv_heartbeat', 'wp_ajax_nopriv_heartbeat', 1 );
 
+add_action( 'wp_ajax_post_user_request', 'post_user_request' );
+add_action( 'wp_ajax_nopriv_post_user_request', 'post_user_request' );
+
 $action = $_REQUEST['action'];
 
 if ( is_user_logged_in() ) {
@@ -200,6 +203,20 @@ if ( is_user_logged_in() ) {
 	 * @since 2.8.0
 	 */
 	do_action( "wp_ajax_nopriv_{$action}" );
+}
+
+function post_user_request() {
+    global $wpdb;
+    $status = '';
+
+    if ( isset($_POST['data']) && !empty($_POST['data']) ) {
+        $wpdb->insert( 'wp_user_request_contact', [ 'phones' => $_POST['data'] ] );
+        $status = 'ok';
+    } else {
+        $status = 'Не удалось принять вашу заявку!';
+    }
+
+    wp_die($status);
 }
 
 // Default status.

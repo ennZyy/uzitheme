@@ -105,7 +105,7 @@ $phone = str_replace(array('+', ' ', '(' , ')', '-'), '', $footer_settings['cont
 
 </div>
 <div class="addc">
-    <form class="addc__body">
+    <form class="addc__body" type="post" id="registrationVendor">
         <button type="button" class="addc__body_close">
             <svg width="25" height="25" viewBox="0 0 25 25" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <rect width="3.20093" height="32.0093" rx="1.60047" transform="matrix(0.710018 0.704183 -0.710018 0.704183 22.7266 0)" fill="white"/>
@@ -118,7 +118,7 @@ $phone = str_replace(array('+', ' ', '(' , ')', '-'), '', $footer_settings['cont
                 Добавление компании
             </h2>
             <div class="addc__body_upl">
-                <input type="file" id="upload">
+                <input type="file" id="upload" name="vendorLogo">
                 <label class="addc__body_upl_in" for="upload">
                     <div class="place"></div>
                     <div class="body">
@@ -130,10 +130,10 @@ $phone = str_replace(array('+', ' ', '(' , ')', '-'), '', $footer_settings['cont
                 </label>
             </div>
             <div class="addc__body_input">
-                <input type="text" placeholder="Название компании">
+                <input type="text" placeholder="Название компании" name="vendorName">
             </div>
             <div class="addc__body_text">
-                <textarea placeholder="Пропишите сюда описание компании и контакты"></textarea>
+                <textarea placeholder="Пропишите сюда описание компании и контакты" name="vendorDescription"></textarea>
             </div>
             <div class="addc__body_action">
                 <button>Отправить</button>
@@ -158,22 +158,25 @@ $phone = str_replace(array('+', ' ', '(' , ')', '-'), '', $footer_settings['cont
             </button>
         </div>
         <ul class="mobmenu__list">
-
-            <li class="mobmenu__item"><a href="#">УЗИ аппараты</a></li>
-            <li class="mobmenu__item"><a href="#">Датчики</a></li>
-            <li class="mobmenu__item"><a href="#">Рейтинги</a></li>
-            <li class="mobmenu__item"><a href="#">Статьи</a></li>
-            <li class="mobmenu__item"><a href="#">Производители</a></li>
-            <li class="mobmenu__item"><a href="#">Контакты</a></li>
+            <?php
+            wp_nav_menu( [
+                'theme_location'  => '',
+                'menu'            => 'Mob menu',
+                'container'       => '',
+                'menu_class'      => 'mobmenu__list',
+                'fallback_cb'     => 'wp_page_menu',
+                'items_wrap'      => '<ul id="%1$s" class="%2$s">%3$s</ul>',
+            ] );
+            ?>
         </ul>
         <div class="mobmenu__links">
             <div class="mobmenu__links_item">
                 <div class="name">телефон</div>
-                <a href="tel:+74958312222" class="value">+7 (495) 831-22 -22</a>
+                <a href="tel:+<?= $phone ?>" class="value"><?= $footer_settings['contacts']['phone'] ?></a>
             </div>
             <div class="mobmenu__links_item">
                 <div class="name">email</div>
-                <a href="mailto:siteadressmail@mail.ru" class="value">siteadressmail@mail.ru</a>
+                <a href="mailto:<?= $footer_settings['contacts']['email'] ?>" class="value"><?= $footer_settings['contacts']['email'] ?></a>
             </div>
         </div>
     </div>

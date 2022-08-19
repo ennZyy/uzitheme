@@ -2,9 +2,7 @@
 $product = wc_get_product();
 $attributes = $product->get_attributes();
 
-//echo '<pre>';
-//print_r($attributes);
-//echo '</pre>';
+$rating = get_field('rating', get_the_ID());
 ?>
 <a href="<?php the_permalink(); ?>" class="list__body_items_item card">
     <div class="card__img">
@@ -30,7 +28,7 @@ $attributes = $product->get_attributes();
                     </div>
                 <?php endif; ?>
                 <div class="values__cnt">
-                    9/10
+                    <?php if ( !empty($rating) ): ?><span><?= $rating ?>/10</span><?php else: ?><span>0/10</span><?php endif; ?>
                 </div>
             </div>
             <div class="link">

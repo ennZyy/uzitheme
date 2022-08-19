@@ -157,7 +157,7 @@ $about_us_settings = get_field('aboutus_settings');
                             <?= $best_devices['title'] ?>
                         </h2>
                         <div class="best__content_action">
-                            <a href="#">Перейти ко всем аппаратам</a>
+                            <a href="<?= get_category_link(47) ?>">Перейти ко всем аппаратам</a>
                         </div>
                     </div>
                     <div class="best__title section__title"><?= $best_devices['title'] ?></div>
@@ -168,7 +168,7 @@ $about_us_settings = get_field('aboutus_settings');
                         'post_status' => 'publish',
                         'ignore_sticky_posts' => 1,
                         'posts_per_page' => 3,
-                        'orderby' => 'name',
+                        'orderby' => 'rating',
                         'order' => 'ASC',
                         'post__in' => wc_get_featured_product_ids()
                     ));
@@ -204,26 +204,19 @@ $about_us_settings = get_field('aboutus_settings');
                         <div class="pop__slider swiper">
                             <div class="pop__slider_wr swiper-wrapper">
                                 <?php
-                                $vendors = get_wcmp_vendors($manufacturer_settings['manufacturers']);
-
-                                foreach ($vendors as $vendor) {
-                                    $vendor_profile_image = get_user_meta($vendor->id, '_vendor_profile_image', true);
-                                    if (isset($vendor_profile_image) && $vendor_profile_image > 0)
-                                        $vendor_image = wp_get_attachment_url($vendor_profile_image);
-                                    else
-                                        $vendor_image = get_avatar_url($vendor->id, array('size' => 120));
+                                foreach ($manufacturer_settings['manufacturers'] as $vendor) :
                                     ?>
-                                    <a href="<?= $vendor->get_permalink() ?>" class="pop__slider_sl swiper-slide">
+                                    <a href="<?= get_post_permalink($vendor->ID) ?>" class="pop__slider_sl swiper-slide">
                                         <div class="pop__slider_sl_img">
                                             <picture>
                                                 <source srcset="" type="image/webp">
-                                                <img src="<?= $vendor_image ?>" alt="<?= $vendor->page_title ?>">
+                                                <?= get_the_post_thumbnail($vendor->ID, '', ['alt' => $vendor->post_title]) ?>
                                             </picture>
                                         </div>
-                                        <div class="pop__slider_sl_name"><?= $vendor->page_title ?></div>
+                                        <div class="pop__slider_sl_name"><?= $vendor->post_title ?></div>
                                     </a>
                                     <?php
-                                }
+                                endforeach;
                                 ?>
                             </div>
 
@@ -308,7 +301,7 @@ $about_us_settings = get_field('aboutus_settings');
                             получите бесплатную
                             консультацию от наших специалистов
                         </div>
-                        <input type="tel" id="telInput" class="feed__body_input" placeholder="+7 (ХХХ) ХХХ ХХ ХХ">
+                        <input type="tel" id="telInput" name="userPhone" class="feed__body_input" placeholder="+7 (ХХХ) ХХХ ХХ ХХ">
                         <button class="feed__body_btn">
                             Получить консультацию
                         </button>
@@ -347,7 +340,14 @@ $about_us_settings = get_field('aboutus_settings');
                             'posts_per_page' => 8,
                             'orderby' => 'name',
                             'order' => 'ASC',
-                            'post__in' => wc_get_featured_product_ids()
+                            'post__in' => wc_get_featured_product_ids(),
+                            'tax_query' => array(
+                                array(
+                                    'taxonomy' => 'product_cat',
+                                     'field' => 'slug',
+                                    'terms' => 'ultrasound-machines',
+                                )
+                            )
                         ));
                         if ($featured->have_posts()) :
                             ?>
@@ -359,9 +359,16 @@ $about_us_settings = get_field('aboutus_settings');
                             </div>
                         <?php endif; ?>
                     </div>
-                    <div class="apr__action">
-                        <button>Показать еще</button>
-                    </div>
+                    <?php if ($featured->max_num_pages > 1) : ?>
+                        <script>
+                            var posts_vars = '<?php echo serialize($featured->query_vars); ?>';
+                            var current_page = <?php echo (get_query_var('paged')) ? get_query_var('paged') : 1; ?>;
+                            var max_pages = '<?php echo $featured->max_num_pages; ?>';
+                        </script>
+                        <div class="apr__action">
+                            <button id="home-loadmore">Показать еще</button>
+                        </div>
+                    <?php endif; ?>
                 </div>
             </div>
         </section>

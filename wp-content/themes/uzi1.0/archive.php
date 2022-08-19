@@ -7,45 +7,61 @@
  * @package BPSD
  */
 
+$vendors_query = $wpb_all_query = new WP_Query(
+    array(
+        'post_type'=>'vendors',
+        'post_status'=>'publish',
+        'order' => 'DESC',
+        'posts_per_page'=>'9'));
+
+$vendors = $vendors_query->posts;
+
+//echo '<pre>';
+//print_r($vendors);
+//echo '</pre>';
+
 get_header();
 ?>
 
-	<main id="primary" class="site-main">
-
-		<?php if ( have_posts() ) : ?>
-
-			<header class="page-header">
-				<?php
-				the_archive_title( '<h1 class="page-title">', '</h1>' );
-				the_archive_description( '<div class="archive-description">', '</div>' );
-				?>
-			</header><!-- .page-header -->
-
-			<?php
-			/* Start the Loop */
-			while ( have_posts() ) :
-				the_post();
-
-				/*
-				 * Include the Post-Type-specific template for the content.
-				 * If you want to override this in a child theme, then include a file
-				 * called content-___.php (where ___ is the Post Type name) and that will be used instead.
-				 */
-				get_template_part( 'template-parts/content', get_post_type() );
-
-			endwhile;
-
-			the_posts_navigation();
-
-		else :
-
-			get_template_part( 'template-parts/content', 'none' );
-
-		endif;
-		?>
-
-	</main><!-- #main -->
+    <main class="main">
+        <section class="vendors">
+            <div class="container">
+                <div class="bc">
+                    <?php  woocommerce_breadcrumb(
+                        array(
+                            'delimiter'   => '',
+                            'wrap_before' => '<div class="bc__list">',
+                            'wrap_after'  => '</div>',
+                            'before'      => '<li class="bc__item">',
+                            'after'       => '</li>',
+                            'home'        => _x( 'Home', 'breadcrumb', 'woocommerce' ),
+                        )
+                    );?>
+                </div>
+                <div class="vendors__in">
+                    <h2 class="vendors__head">
+                        Производители
+                    </h2>
+                    <div class="vendors__list">
+                        <?php foreach ( $vendors as $vendor ): ?>
+                            <div class="vendors__item">
+                                <div class="vendors__item_img">
+                                    <picture>
+                                        <source srcset="" type="image/webp">
+                                        <?= get_the_post_thumbnail($vendor->ID, '', ['alt' => $vendor->post_title]) ?>
+                                    </picture>
+                                </div>
+                                <div class="vendors__item_body">
+                                    <div class="vendors__item_body_name"><?= $vendor->post_title ?></div>
+                                    <a href="<?= get_post_permalink($vendor->ID) ?>" class="vendors__item_body_link">подробнее</a>
+                                </div>
+                            </div>
+                        <?php endforeach; ?>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
 
 <?php
-get_sidebar();
 get_footer();

@@ -43,10 +43,9 @@ $review_total = $product->get_review_count();
 
 $product_attributes = $product->get_attributes();
 
-//echo 'hello world';
-//echo '<pre>';
-//print_r($ratings);
-//echo '</pre>';
+$rating = get_field('rating');
+
+$vendor = get_field('product_vendor');
 
 get_header();
 ?>
@@ -146,7 +145,7 @@ get_header();
                             <div class="prod__main_descr_part">
                                 <div class="head">Цена <?= get_woocommerce_currency_symbol(); ?></div>
                                 <div class="value">
-                                    от <?= $product->get_price() ?> <span>9/10</span>
+                                    от <?= $product->get_price() ?> <?php if ( !empty($rating) ): ?><span><?= $rating ?>/10</span><?php else: ?><span>0/10</span><?php endif; ?>
                                 </div>
                                 <div class="ex">*точную цену узнайте на консультации</div>
                             </div>
@@ -173,11 +172,7 @@ get_header();
                             <div class="prod__main_descr_part">
                                 <div class="head">Характеристики</div>
                                 <div class="list">
-                                    <?php
-                                    $vendors = get_wcmp_product_vendors(get_the_ID());
-                                    $vendor_name = $vendors->user_data->data->user_login;
-                                    ?>
-                                        <div class="list__item">Производитель: <?= $vendor_name ?></div>
+                                    <div class="list__item">Производитель: <?= $vendor->post_title ?></div>
                                     <?php
                                     foreach ( $product_attributes as $attribute_item ):
                                         foreach (wc_get_product_terms( get_the_ID(), $attribute_item->get_data()['name'], array( 'taxonomy' =>  'sensor-frequencies' ) ) as $value): ?>
@@ -465,8 +460,9 @@ get_header();
                         <div class="prod__sml_list">
                             <?php foreach ( $product->get_upsell_ids() as $id ):
                                 $similar = wc_get_product($id);
+                                $rating = get_field('rating', $id);
                             ?>
-                            <a href="#" class="prod__sml_list_item card">
+                            <a href="<?= $similar->get_permalink() ?>" class="prod__sml_list_item card">
                                 <div class="card__img">
                                     <picture>
                                         <source srcset="" type="image/webp">
@@ -481,7 +477,7 @@ get_header();
                                                 от <?= $similar->get_price() ?> <?= get_woocommerce_currency_symbol() ?>
                                             </div>
                                             <div class="values__cnt">
-                                                9/10
+                                                <?php if ( !empty($rating) ): ?><span><?= $rating ?>/10</span><?php else: ?><span>0/10</span><?php endif; ?>
                                             </div>
                                         </div>
                                         <div class="link">
@@ -493,9 +489,21 @@ get_header();
                                             В категориях
                                         </div>
                                         <ul class="list">
-                                            <li class="list__item">— для сердца и сосудов</li>
-                                            <li class="list__item">— для геникологии и акушерства</li>
-                                            <li class="list__item">— 3d/4d аппараты</li>
+                                            <?php
+                                            $attributes = $similar->get_attributes();
+                                            foreach ( $attributes as $attribute_item ):
+                                                foreach (wc_get_product_terms( $similar->get_id(), $attribute_item->get_data()['name'], array( 'taxonomy' =>  'sensor-frequencies' ) ) as $value): ?>
+                                                    <?php
+                                                    if ( $value->taxonomy === 'pa_application-area' ):
+                                                        echo '<li class="list__item">— ' . $value->name . '</li>';
+                                                    endif;
+
+                                                    if ( $value->taxonomy === 'pa_suitable-device' && is_product_category(48) ) {
+                                                        echo '<li class="list__item">— ' . $value->name . '</li>';
+                                                    }
+                                                    ?>
+                                                <?php endforeach;
+                                            endforeach; ?>
                                         </ul>
                                         <div class="action">
                                             <button>
@@ -557,11 +565,13 @@ get_header();
                             </div>
                             <?php foreach( $comments as $comment ) :
                                 $comment_meta=get_comment_meta($comment->comment_ID);
+
                                 $user_name= $comment->comment_author;
 
-//                                echo '<pre>';
-//                                print_r($comment);
-//                                echo '</pre>';
+                                echo '<pre>';
+                                print_r($comment);
+                                print_r($comment_meta);
+                                echo '</pre>';
                                 ?>
                             <div class="prod__comment_list_item">
                                 <div class="text">
@@ -641,15 +651,24 @@ get_header();
                                 <div class="sensor__main_body_content_part">
                                     <div class="head">Описание</div>
                                     <div class="list">
-                                        <div class="list__item">
-                                            Диапазон частот 6-18 МГц;
-                                        </div>
-                                        <div class="list__item">
-                                            Центральная частота 12 МГц;
-                                        </div>
-                                        <div class="list__item">
-                                            Апертура 25 мм.
-                                        </div>
+                                        <?php
+                                        foreach ( $product_attributes as $attribute_item ):
+                                            foreach (wc_get_product_terms( $product->get_id(), $attribute_item->get_data()['name'], array( 'taxonomy' =>  'sensor-frequencies' ) ) as $value): ?>
+                                                <?php
+                                                if ( $value->taxonomy === 'pa_sensor-frequencies' ):
+                                                    echo '<div class="list__item">Диапазон частот ' . $value->name . '</div>';
+                                                endif;
+
+                                                if ( $value->taxonomy === 'pa_center-frequencies' ) {
+                                                    echo '<div class="list__item">Центральная частота' . $value->name . '</div>';
+                                                }
+
+                                                if ( $value->taxonomy === 'pa_aperture' ) {
+                                                    echo '<div class="list__item">Апертура' . $value->name . '</div>';
+                                                }
+                                                ?>
+                                            <?php endforeach;
+                                        endforeach; ?>
                                     </div>
                                 </div>
                                 <div class="sensor__main_body_content_part">

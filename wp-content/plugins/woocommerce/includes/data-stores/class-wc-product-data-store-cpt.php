@@ -241,6 +241,10 @@ class WC_Product_Data_Store_CPT extends WC_Data_Store_WP implements WC_Object_Da
 				clean_post_cache( $product->get_id() );
 			} else {
 				wp_update_post( array_merge( array( 'ID' => $product->get_id() ), $post_data ) );
+				$rating = get_field('rating', $product->get_id());
+				if ( !empty($rating) ) {
+                    update_post_meta( $product->get_id(), '_wc_rating_count', $rating );
+                }
 			}
 			$product->read_meta_data( true ); // Refresh internal meta data, in case things were hooked into `save_post` or another WP hook.
 

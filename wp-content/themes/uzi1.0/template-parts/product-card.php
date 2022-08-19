@@ -1,5 +1,7 @@
 <?php
 $product = wc_get_product();
+$product_attributes = $product->get_attributes();
+$rating = get_field('rating', get_the_ID());
 ?>
 
 <a href="<?php the_permalink(); ?>" class="best__item card">
@@ -26,7 +28,7 @@ $product = wc_get_product();
                     </div>
                 <?php endif; ?>
                 <div class="values__cnt">
-                    9/10
+                    <?php if ( !empty($rating) ): ?><span><?= $rating ?>/10</span><?php else: ?><span>0/10</span><?php endif; ?>
                 </div>
             </div>
             <div class="link">
@@ -39,11 +41,20 @@ $product = wc_get_product();
             </div>
             <ul class="list">
                 <?php
-                $categories = get_the_terms( $product->get_id(), 'product_cat' );
+                foreach ( $product_attributes as $attribute_item ):
+                    foreach (wc_get_product_terms( $product->get_id(), $attribute_item->get_data()['name'], array( 'taxonomy' =>  'sensor-frequencies' ) ) as $value): ?>
+                        <?php
+                        if ( $value->taxonomy === 'pa_application-area' ):
+                            echo '<li class="list__item">— ' . $value->name . '</li>';
+                        endif;
 
-                foreach ($categories as $category) : ?>
-                    <li class="list__item">— <?= $category->name ?></li>
-                <?php endforeach; ?>
+                        if ( $value->taxonomy === 'pa_suitable-device' && is_product_category(48) ) {
+                            echo '<li class="list__item">— ' . $value->name . '</li>';
+                        }
+
+                        ?>
+                    <?php endforeach;
+                endforeach; ?>
             </ul>
             <div class="action">
                 <button>

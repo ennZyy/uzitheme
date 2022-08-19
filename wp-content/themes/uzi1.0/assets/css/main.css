@@ -20,7 +20,15 @@
 }
 
 #wpadminbar {
-  display: none;
+  display: block;
+}
+
+.wrapper {
+  overflow-x: clip !important;
+}
+
+.woocommerce-products-header__title {
+  display: none !important;
 }
 
 body {
@@ -4910,4 +4918,15 @@ body {
   height: 100%;
   object-fit: contain;
   border-radius: 10px;
+}
+
+.vendor__list {
+  transition: .3s;
+}
+
+.vendor__list-hidden,
+.sensor__list-hidden {
+  opacity: 0;
+  height: 0;
+  visibility: hidden;
 }

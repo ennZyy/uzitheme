@@ -1,9 +1,8 @@
 <?php
 $current_category = get_queried_object();
-$per_page=9;
 $products = new WP_Query(array(
     'post_type' => 'product',
-    'posts_per_page' => $per_page,
+    'posts_per_page' => '9',
     'orderby' => 'meta_value_num',
     'meta_key' => '_price',
     'order' => 'asc',
@@ -279,7 +278,7 @@ get_header();
                         </div>
                         <div class="list__body_items">
                             <?php
-                            if($products->have_posts()):
+                             if($products->have_posts()):
                                 while ($products->have_posts()) :
                                     $products->the_post();
                                     get_template_part( 'template-parts/category-product', 'card');
@@ -290,8 +289,13 @@ get_header();
                             ?>
                         </div>
                         <div class="list__body_action">
-                            <?php if ( count($products->posts) > 9 ): ?>
-                                <button>Показать еще</button>
+                            <?php if ($products->max_num_pages > 1) : ?>
+                                <script>
+                                    var posts_vars = '<?php echo serialize($products->query_vars); ?>';
+                                    var current_page = <?php echo (get_query_var('paged')) ? get_query_var('paged') : 1; ?>;
+                                    var max_pages = '<?php echo $products->max_num_pages; ?>';
+                                </script>
+                                <button id="loadmore">Показать ещё</button>
                             <?php endif; ?>
                         </div>
                     </div>

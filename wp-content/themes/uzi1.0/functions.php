@@ -146,6 +146,7 @@ function uzi_scripts() {
 
     wp_enqueue_script( 'uzi-main-js', get_template_directory_uri() . '/assets/js/app.js', array('jquery'), _S_VERSION, true );
     wp_enqueue_script( 'uzi-product-js', get_template_directory_uri() . '/assets/js/product.js', array('jquery'), _S_VERSION, true );
+    wp_enqueue_script( 'uzi-sub-main-js', get_template_directory_uri() . '/assets/js/main.js', array('jquery'), _S_VERSION, true );
 
     if(is_product()){
         wp_localize_script( 'uzi-product-js', 'ajax_url',
@@ -154,6 +155,12 @@ function uzi_scripts() {
             )
         );
     }
+
+    wp_localize_script( 'uzi-sub-main-js', 'ajax_url',
+        array(
+            'url' => admin_url('admin-ajax.php')
+        )
+    );
 }
 add_action( 'wp_enqueue_scripts', 'uzi_scripts' );
 
@@ -621,6 +628,8 @@ function add_custom_class_to_menu_item($classes, $item, $args)
         $classes[] = '';
     } elseif ('Menu 404' === $args->menu) {
         $classes[] = 'notfound__body_item';
+    } elseif ('Mob menu' === $args->menu ) {
+        $classes[] = 'mobmenu__item';
     }
 
     return $classes;
@@ -670,3 +679,423 @@ function wpds_increament_post_view() {
             update_post_meta($post->ID, $views_key, ++$views);
     }
 }
+
+//Добавление post type - производитель
+add_action( 'init', function() {
+
+    register_post_type( 'vendors',
+        [
+            'public'                    => true,
+            'menu_icon'                 => 'dashicons-welcome-widgets-menus',
+            'supports'                  => [
+                'title',
+                'editor',
+                'thumbnail',
+                'custom-fields' => [
+                        'test'  => 'test'
+                ]
+            ],
+            'labels'                    => [
+                'name'                  => 'Производители',
+                'all_items'             => 'Список всех производителей',
+                'add_new'               => 'Добавить нового производителя',
+                'featured_image'        => 'Изображение производителя',
+                'set_featured_image'    => 'Установить изображение производителя',
+            ],
+            'exclude_from_search'       => true,
+            'has_archive'               => true,
+            'menu_position'             => 3
+        ]
+    );
+
+} );
+
+function get_vendor_product($vendor_id) {
+    $vendor_products = [];
+    $all_products = new WP_Query([
+        'post_type'              => array( 'product' ),
+        'post_status'            => array( 'publish' ),
+        'nopaging'               => true,
+    ]);
+
+    foreach ( $all_products->posts as $product ) {
+        $product_meta = get_post_meta($product->ID);
+
+        if ( isset($product_meta['product_vendor']) && !empty($product_meta['product_vendor']) && $product_meta['product_vendor'][0] == $vendor_id ) {
+            $vendor_products[] = $product;
+            $product->rating = $product_meta['rating'][0];
+        }
+    }
+
+    return $vendor_products;
+}
+
+function add_user_contact_page() {
+    add_menu_page(
+        'Заявки пользователей',
+        'Заявки пользователей',
+        'administrator',
+        'user-request',
+        'get_user_contact_page',
+        'dashicons-buddicons-pm',
+        2
+    );
+}
+add_action( 'admin_menu', 'add_user_contact_page' );
+
+function get_user_contact_page() {
+    global $wpdb;
+
+    $phones = $wpdb->get_results('SELECT * FROM `wp_user_request_contact`', ARRAY_A);
+    ?>
+    <style>
+        #customers {
+            font-family: Arial, Helvetica, sans-serif;
+            border-collapse: collapse;
+            width: 100%;
+        }
+
+        #customers td, #customers th {
+            border: 1px solid #ddd;
+            padding: 8px;
+        }
+
+        #customers tr:nth-child(even){background-color: #f2f2f2;}
+
+        #customers tr:hover {background-color: #ddd;}
+
+        #customers th {
+            padding-top: 12px;
+            padding-bottom: 12px;
+            text-align: left;
+            background-color: #fff;
+            color: #000000;
+        }
+    </style>
+    </head>
+    <body>
+
+    <h1>Заявки пользователей</h1>
+
+    <?php if ( !empty($phones) ): ?>
+    <table id="customers">
+        <tr>
+            <th>ID</th>
+            <th>Phone</th>
+        </tr>
+        <?php foreach ( $phones as $phone ):
+            $phone_number = str_replace(array('+', ' ', '(' , ')', '-'), '', $phone['phones']);;
+        ?>
+        <tr>
+            <th><?= $phone['id'] ?></th>
+            <th>
+                <a href="tel:+<?= $phone_number ?>"><?= $phone['phones'] ?></a>
+            </th>
+        </tr>
+        <?php endforeach; ?>
+    </table>
+    <?php endif;
+}
+
+function get_wc_product_by_title( $title ){
+    global $wpdb;
+
+    $post_title = strval($title);
+
+    $post_table = $wpdb->prefix . "posts";
+    $result = $wpdb->get_col("
+        SELECT ID
+        FROM $post_table
+        WHERE post_title LIKE '$post_title'
+        AND post_type LIKE 'product'
+    ");
+
+    if( empty( $result[0] ) )
+        return;
+    else
+        return wc_get_product( intval( $result[0] ) );
+}
+
+function loadmore_get_posts(){
+    $args = unserialize(stripslashes($_POST['query']));
+    $args['paged'] = $_POST['page'] + 1;
+    $args['post_status'] = 'publish';
+
+    $posts = query_posts($args);
+
+    foreach ($posts as $post) :
+        $product = new WC_Product($post->ID);
+        $attributes = $product->get_attributes();
+
+        $rating = get_field('rating', get_the_ID());
+    ?>
+        <a href="<?= $product->get_permalink() ?>" class="list__body_items_item card" id="nercard">
+            <div class="card__img">
+                <picture>
+                    <source srcset="" type="image/webp">
+                    <img
+                            src="<?= wp_get_attachment_url($product->get_image_id()); ?>"
+                            alt="<?= $product->get_title() ?>"
+                    >
+                </picture>
+            </div>
+            <div class="card__body">
+                <div class="card__body_main">
+                    <div class="name"><?= $product->get_title() ?></div>
+                    <div class="values">
+                            <div class="values__price">
+                                от <?php echo $product->get_price() . get_woocommerce_currency_symbol( $currency = '' ); ?>
+                            </div>
+                        <div class="values__cnt">
+                            <?php if ( !empty($rating) ): ?><span><?= $rating ?>/10</span><?php else: ?><span>0/10</span><?php endif; ?>
+                        </div>
+                    </div>
+                    <div class="link">
+                        <div>Подробнее</div>
+                    </div>
+                </div>
+                <div class="card__body_ex">
+                    <div class="head">
+                        В категориях
+                    </div>
+                    <?php if ( !empty( $attributes ) ): ?>
+                    <ul class="list">
+                        <?php
+                        foreach ( $attributes as $attribute_item ):
+                            foreach (wc_get_product_terms( $product->get_id(), $attribute_item->get_data()['name'], array( 'taxonomy' =>  'sensor-frequencies' ) ) as $value): ?>
+                                <?php
+                                if ( $value->taxonomy === 'pa_application-area' ):
+                                    echo '<li class="list__item">— ' . $value->name . '</li>';
+                                endif;
+
+                                if ( $value->taxonomy === 'pa_suitable-device' && is_product_category(48) ) {
+                                    echo '<li class="list__item">— ' . $value->name . '</li>';
+                                }
+
+                                ?>
+                            <?php endforeach;
+                        endforeach; ?>
+                    </ul>
+                    <?php endif; ?>
+                    <div class="action">
+                        <button>
+                            Консультация в один клик
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+        </a>
+
+    <?php
+    endforeach;
+
+    wp_die();
+}
+add_action('wp_ajax_loadmore', 'loadmore_get_posts');
+add_action('wp_ajax_nopriv_loadmore', 'loadmore_get_posts');
+
+function loadmore_featured(){
+    $args = unserialize(stripslashes($_POST['query']));
+    $args['paged'] = $_POST['page'] + 1;
+    $args['post_status'] = 'publish';
+
+    $posts = query_posts($args);
+
+    foreach ($posts as $post) :
+        $product = new WC_Product($post->ID);
+        $attributes = $product->get_attributes();
+
+        $rating = get_field('rating', get_the_ID());
+        ?>
+        <a href="<?= $product->get_permalink() ?>" class="apr__item card" id="nercard">
+            <div class="card__img">
+                <picture>
+                    <source srcset="" type="image/webp">
+                    <img
+                            src="<?= wp_get_attachment_url($product->get_image_id()); ?>"
+                            alt="<?= $product->get_title(); ?>"
+                    >
+                </picture>
+            </div>
+            <div class="card__body">
+                <div class="card__body_main">
+                    <div class="name"><?= $product->get_title(); ?></div>
+                    <div class="values">
+                        <div class="values__price">
+                            от <?php echo $product->get_price() . get_woocommerce_currency_symbol( $currency = '' ); ?>
+                        </div>
+                        <div class="values__cnt">
+                            <?php if ( !empty($rating) ): ?><span><?= $rating ?>/10</span><?php else: ?><span>0/10</span><?php endif; ?>
+                        </div>
+                    </div>
+                    <div class="link">
+                        <div>Подробнее</div>
+                    </div>
+                </div>
+                <div class="card__body_ex">
+                    <div class="head">
+                        В категориях
+                    </div>
+                    <?php if ( !empty( $attributes ) ): ?>
+                        <ul class="list">
+                            <?php
+                            foreach ( $attributes as $attribute_item ):
+                                foreach (wc_get_product_terms( $product->get_id(), $attribute_item->get_data()['name'], array( 'taxonomy' =>  'sensor-frequencies' ) ) as $value): ?>
+                                    <?php
+                                    if ( $value->taxonomy === 'pa_application-area' ):
+                                        echo '<li class="list__item">— ' . $value->name . '</li>';
+                                    endif;
+
+                                    if ( $value->taxonomy === 'pa_suitable-device' && is_product_category(48) ) {
+                                        echo '<li class="list__item">— ' . $value->name . '</li>';
+                                    }
+
+                                    ?>
+                                <?php endforeach;
+                            endforeach; ?>
+                        </ul>
+                    <?php endif; ?>
+                    <div class="action">
+                        <button>
+                            Консультация в один клик
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+        </a>
+
+    <?php
+    endforeach;
+
+    wp_die();
+}
+add_action('wp_ajax_loadmore_featured', 'loadmore_featured');
+add_action('wp_ajax_nopriv_loadmore_featured', 'loadmore_featured');
+
+function loadmore_get_articles(){
+    $args = unserialize(stripslashes($_POST['query']));
+    $args['paged'] = $_POST['page'] + 1;
+    $args['post_status'] = 'publish';
+
+    $posts = query_posts($args);
+
+    foreach ($posts as $post) :
+        ?>
+        <a href="<?= $post->guid ?>" class="articles__list_item art">
+            <div class="art__img">
+                <picture>
+                    <source srcset="" type="image/webp">
+                    <img src="<?= get_the_post_thumbnail($post->ID) ?>" alt="<?= $post->post_title ?>">
+                </picture>
+            </div>
+            <div class="art__body">
+                <div class="art__body_name"><?= $post->post_title ?></div>
+                <div class="art__body_info">
+                    <div class="art__body_info_item art__body_info_item-rep">(<?= get_comments_number($post->ID) ?>)</div>
+                    <div class="art__body_info_item art__body_info_item-sn">(<?= get_post_views($post->ID) ?>)</div>
+                </div>
+            </div>
+        </a>
+    <?php
+    endforeach;
+
+    wp_die();
+}
+add_action('wp_ajax_loadmore_get_articles', 'loadmore_get_articles');
+add_action('wp_ajax_nopriv_loadmore_get_articles', 'loadmore_get_articles');
+
+function filter_articles_by_date() {
+    $posts = new WP_Query(
+        array(
+            'post_type'=>'post',
+            'post_status'=>'publish',
+            'order' => $_POST['orderBy'],
+            'posts_per_page'=>'-1'));
+
+    foreach ( $posts->posts as $post ) {
+        $post_comment_count = get_comments_number($post->ID);
+        $post_views = get_post_views($post->ID);
+        ?>
+        <a href="<?= $post->guid ?>" class="articles__list_item art">
+            <div class="art__img">
+                <picture>
+                    <source srcset="" type="image/webp">
+                    <img src="<?= get_the_post_thumbnail($post->ID) ?>" alt="<?= $post->post_title ?>">
+                </picture>
+            </div>
+            <div class="art__body">
+                <div class="art__body_name"><?= $post->post_title ?></div>
+                <div class="art__body_info">
+                    <div class="art__body_info_item art__body_info_item-rep">(<?= $post_comment_count ?>)</div>
+                    <div class="art__body_info_item art__body_info_item-sn">(<?= $post_views ?>)</div>
+                </div>
+            </div>
+        </a>
+        <?php
+    }
+
+    wp_die();
+}
+add_action('wp_ajax_filter_articles_by_date', 'filter_articles_by_date');
+add_action('wp_ajax_nopriv_filter_articles_by_date', 'filter_articles_by_date');
+
+function filter_articles_by_views() {
+    $order_views = $_POST['views'];
+    $data = [];
+    $posts = new WP_Query(
+        array(
+            'post_type'=>'post',
+            'post_status'=>'publish',
+            'order'=>'ASC'));
+
+    $filtered_posts = [];
+    $views_key = 'wpds_post_views';
+
+    foreach ( $posts->posts as $post ) {
+        $views = get_post_meta($post->ID, $views_key, true);
+
+        $filtered_posts[] = [
+          'id'    => $post->ID,
+          'views' => $views
+        ];
+    }
+
+    if ($order_views == 'popular') {
+        usort($filtered_posts, function($a, $b){
+            return ($a['views'] < $b['views']);
+        });
+    } else {
+        usort($filtered_posts, function($a, $b){
+            return ($a['views'] > $b['views']);
+        });
+    }
+
+    foreach ( $filtered_posts as $item ) {
+        $post = get_post($item['id']);
+        $post_comment_count = get_comments_number($item['id']);
+        $post_views = get_post_views($item['id']);
+        ?>
+        <a href="<?= $post->guid ?>" class="articles__list_item art">
+            <div class="art__img">
+                <picture>
+                    <source srcset="" type="image/webp">
+                    <img src="<?= get_the_post_thumbnail($post->ID) ?>" alt="<?= $post->post_title ?>">
+                </picture>
+            </div>
+            <div class="art__body">
+                <div class="art__body_name"><?= $post->post_title ?></div>
+                <div class="art__body_info">
+                    <div class="art__body_info_item art__body_info_item-rep">(<?= $post_comment_count ?>)</div>
+                    <div class="art__body_info_item art__body_info_item-sn">(<?= $post_views ?>)</div>
+                </div>
+            </div>
+        </a>
+    <?php
+    }
+
+    wp_die();
+}
+add_action('wp_ajax_filter_articles_by_views', 'filter_articles_by_views');
+add_action('wp_ajax_nopriv_filter_articles_by_views', 'filter_articles_by_views');
