@@ -15,12 +15,12 @@ $innovative_technologies = get_field('innovative_technologies');
 $example = get_field('example');
 $ratings = get_field('product_rating');
 
-$comments = get_comments( array(
-    'status'      => 'approve',
-    'post_status' => 'publish',
-    'post_type'   => 'product',
-    'post_id'=> get_the_ID()
-));
+$comments_args = [
+    'post_id'=>$product->get_id(),
+    'orderby'=>'comment_parent',
+    'order'=>'ASC',
+];
+$comments = get_comment_replies(0, $comments_args);
 
 $sensor_products = new WP_Query(array(
     'post_type' => 'product',
@@ -172,7 +172,7 @@ get_header();
                             <div class="prod__main_descr_part">
                                 <div class="head">Характеристики</div>
                                 <div class="list">
-                                    <div class="list__item">Производитель: <?= $vendor->post_title ?></div>
+                                    <div class="list__item">Производитель: <?php if ( $vendor ) { $vendor->post_title; } else {echo 'Производитель не указан';} ?></div>
                                     <?php
                                     foreach ( $product_attributes as $attribute_item ):
                                         foreach (wc_get_product_terms( get_the_ID(), $attribute_item->get_data()['name'], array( 'taxonomy' =>  'sensor-frequencies' ) ) as $value): ?>
@@ -558,56 +558,54 @@ get_header();
                             </form>
                         </div>
 
+                        <?php
+
+//                        echo '<pre>';
+//                        print_r($comments);
+//                        echo '</pre>';
+
+                        ?>
+
                         <?php if ( !empty($comments) ): ?>
                             <div class="prod__comment_list">
                             <div class="prod__comment_list_head">
                                 Комментарии <span>(<?= $review_total ?>)</span>
                             </div>
                             <?php foreach( $comments as $comment ) :
-                                $comment_meta=get_comment_meta($comment->comment_ID);
+                                if (empty($comment->comment_parent) && $comment->comment_approved == 1) :
+                                    $comment_meta=get_comment_meta($comment->comment_ID);
 
-                                $user_name= $comment->comment_author;
-
-                                echo '<pre>';
-                                print_r($comment);
-                                print_r($comment_meta);
-                                echo '</pre>';
-                                ?>
-                            <div class="prod__comment_list_item">
-                                <div class="text">
-                                    <?= $comment->comment_content ?>
-                                </div>
-                                <div class="action">
-                                    <div class="action__name"><?= $user_name ?></div>
-                                    <div class="action__date"><?= date('d.m.Y', strtotime($comment->comment_date)) ?></div>
-                                    <button class="action__btn comment-answer-btn" data-comment>Ответить</button>
-                                    <?php
-                                    $comment_reply_link = get_comment_reply_link(
-                                            array(
-                                                'add_below' => 'div-comment',
-                                                'depth'     => 1,
-                                                'max_depth' => 5,
-                                                'before'    => '<span class="comment-reply action__btn comment-answer-btn">',
-                                                'after'     => '</span>',
-                                            )
-                                    );
-
-                                    echo $comment_reply_link;
+                                    $user_name= $comment->comment_author;
                                     ?>
-                                </div>
-                            </div>
+                                    <div class="prod__comment_list_item">
+                                        <div class="text">
+                                            <?= $comment->comment_content ?>
+                                        </div>
+                                        <div class="action">
+                                            <div class="action__name"><?= $user_name ?></div>
+                                            <div class="action__date"><?= date('d.m.Y', strtotime($comment->comment_date)) ?></div>
+                                            <button class="action__btn comment-answer-btn" data-comment="<?= $comment->comment_ID ?>">Ответить</button>
+                                        </div>
+                                    </div>
 
-                            <?php endforeach; ?>
-                            <!--<div class="prod__comment_list_item answer">
-                                <div class="text">
-                                    Господа, существующая теория требует определения и уточнения переосмысления внешнеэкономических политик. Идейные соображения высшего порядка, а также повышение уровня гражданского сознания влечет за собой процесс внедрения и модернизации экономической целесообразности принимаемых решений. Предварительные выводы неутешительны: высокотехнологичная концепция общественного уклада выявляет срочную потребность новых предложений.
-                                </div>
-                                <div class="action">
-                                    <div class="action__name">Татьяна</div>
-                                    <div class="action__date">22.11.2021</div>
-                                    <button class="action__btn comment-answer-btn">Ответить</button>
-                                </div>
-                            </div>-->
+                                <?php if ( !empty($comment->replies) ): ?>
+                                    <?php foreach ( $comment->replies as $answer ):
+                                        $answer_name= $answer->comment_author;
+                                        ?>
+                                    <div class="prod__comment_list_item answer">
+                                        <div class="text">
+                                            <?= $answer->comment_content ?>
+                                        </div>
+                                        <div class="action">
+                                            <div class="action__name"><?= $answer_name ?></div>
+                                            <div class="action__date"><?= date('d.m.Y', strtotime($answer->comment_date)) ?></div>
+                                            <button class="action__btn comment-answer-btn" data-comment="<?= $comment->comment_ID ?>">Ответить</button>
+                                        </div>
+                                    </div>
+                                    <?php endforeach; ?>
+                                <?php endif; ?>
+                            <?php endif;
+                            endforeach; ?>
                         </div>
                         <?php endif; ?>
                     </div>

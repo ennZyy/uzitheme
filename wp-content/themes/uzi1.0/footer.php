@@ -105,7 +105,7 @@ $phone = str_replace(array('+', ' ', '(' , ')', '-'), '', $footer_settings['cont
 
 </div>
 <div class="addc">
-    <form class="addc__body" type="post" id="registrationVendor">
+    <form class="addc__body" id="registrationVendor">
         <button type="button" class="addc__body_close">
             <svg width="25" height="25" viewBox="0 0 25 25" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <rect width="3.20093" height="32.0093" rx="1.60047" transform="matrix(0.710018 0.704183 -0.710018 0.704183 22.7266 0)" fill="white"/>
@@ -118,8 +118,8 @@ $phone = str_replace(array('+', ' ', '(' , ')', '-'), '', $footer_settings['cont
                 Добавление компании
             </h2>
             <div class="addc__body_upl">
-                <input type="file" id="upload" name="vendorLogo">
-                <label class="addc__body_upl_in" for="upload">
+                <input type="file" id="uploadLogo" name="vendorLogo">
+                <label class="addc__body_upl_in" for="uploadLogo">
                     <div class="place"></div>
                     <div class="body">
                         <div class="body__name">Прикрепите лого компании</div>
@@ -136,7 +136,7 @@ $phone = str_replace(array('+', ' ', '(' , ')', '-'), '', $footer_settings['cont
                 <textarea placeholder="Пропишите сюда описание компании и контакты" name="vendorDescription"></textarea>
             </div>
             <div class="addc__body_action">
-                <button>Отправить</button>
+                <button class="vendor__registration">Отправить</button>
             </div>
         </div>
     </form>
@@ -181,6 +181,12 @@ $phone = str_replace(array('+', ' ', '(' , ')', '-'), '', $footer_settings['cont
         </div>
     </div>
 </div>
+
+<!--<div class="addc__success">-->
+<!--    <p class="addc__success">-->
+<!--        Ваша компания отправлена, после модерации мы добавим ее на сайт-->
+<!--    </p>-->
+<!--</div>-->
 
 <?php wp_footer(); ?>
 

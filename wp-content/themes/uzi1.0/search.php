@@ -1,16 +1,12 @@
 <?php
-/**
- * The template for displaying search results pages
- *
- * @link https://developer.wordpress.org/themes/basics/template-hierarchy/#search-result
- *
- * @package BPSD
- */
+
+$query = get_search_query();
+$sentence = $_GET['sentence'];
+$search_types = explode(',', $_GET['post_type']);
 
 get_header();
-
-wc_page_noindex()
 ?>
+
     <main class="main">
         <section class="search">
             <div class="container">
@@ -28,228 +24,109 @@ wc_page_noindex()
                 </div>
                 <div class="search__in">
                     <div class="search__head">
-                        Поиск по фразе «<span><?= get_search_query() ?></span>»
+                        <?php printf( esc_html__( ' Поиск по фразе «%s»', 'uzi' ), '<span>' . get_search_query() . '</span>' ); ?>
                     </div>
                     <div class="search__list">
-                        <a href="#" class="search__list_item card">
-                            <div class="card__img">
-                                <picture>
-                                    <source srcset="" type="image/webp">
-                                    <img src="./img/card/card.png" alt="">
-                                </picture>
-                            </div>
-                            <div class="card__body">
-                                <div class="card__body_main">
-                                    <div class="name">Philips SE 310</div>
-                                    <div class="values">
-                                        <div class="values__price">
-                                            от 2 800 000 ₽
-                                        </div>
-                                        <div class="values__cnt">
-                                            9/10
-                                        </div>
-                                    </div>
-                                    <div class="link">
-                                        <div>Подробнее</div>
-                                    </div>
-                                </div>
-                                <div class="card__body_ex">
-                                    <div class="head">
-                                        В категориях
-                                    </div>
-                                    <ul class="list">
-                                        <li class="list__item">— для сердца и сосудов</li>
-                                        <li class="list__item">— для геникологии и акушерства</li>
-                                        <li class="list__item">— 3d/4d аппараты</li>
-                                    </ul>
-                                    <div class="action">
-                                        <button>
-                                            Консультация в один клик
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
 
-                        </a>
-                        <a href="#" class="search__list_item card">
-                            <div class="card__img">
-                                <picture>
-                                    <source srcset="" type="image/webp">
-                                    <img src="./img/card/card.png" alt="">
-                                </picture>
-                            </div>
-                            <div class="card__body">
-                                <div class="card__body_main">
-                                    <div class="name">Philips SE 310</div>
-                                    <div class="values">
-                                        <div class="values__price">
-                                            от 2 800 000 ₽
-                                        </div>
-                                        <div class="values__cnt">
-                                            9/10
-                                        </div>
-                                    </div>
-                                    <div class="link">
-                                        <div>Подробнее</div>
-                                    </div>
-                                </div>
-                                <div class="card__body_ex">
-                                    <div class="head">
-                                        В категориях
-                                    </div>
-                                    <ul class="list">
-                                        <li class="list__item">— для сердца и сосудов</li>
-                                        <li class="list__item">— для геникологии и акушерства</li>
-                                        <li class="list__item">— 3d/4d аппараты</li>
-                                    </ul>
-                                    <div class="action">
-                                        <button>
-                                            Консультация в один клик
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
+                        <?php foreach ( $search_types as $type ):
+                            $posts = new WP_Query(
+                                [
+                                    'post_type' => $type,
+                                    'order'     => 'DESC',
+                                    's'         => $query,
+                                    'sentence'  => $sentence
+                                ]
+                            );
 
-                        </a>
-                        <a href="#" class="search__list_item card">
-                            <div class="card__img">
-                                <picture>
-                                    <source srcset="" type="image/webp">
-                                    <img src="./img/card/card.png" alt="">
-                                </picture>
-                            </div>
-                            <div class="card__body">
-                                <div class="card__body_main">
-                                    <div class="name">Philips SE 310</div>
-                                    <div class="values">
-                                        <div class="values__price">
-                                            от 2 800 000 ₽
+                            foreach ( $posts->posts as $post ):
+                                if ( $post->post_type == 'product' ):
+                                    $product = wc_get_product($post->ID);
+                                    $product_rating = get_field('rating', $post->ID);
+                                    $product_attributes = $product->get_attributes();
+                                    ?>
+                                    <a href="<?= $product->get_permalink() ?>" class="search__list_item card">
+                                        <div class="card__img">
+                                            <picture>
+                                                <source srcset="" type="image/webp">
+                                                <img
+                                                    src="<?= wp_get_attachment_url($product->get_image_id()); ?>"
+                                                    alt="<?= $product->get_title() ?>"
+                                                >
+                                            </picture>
                                         </div>
-                                        <div class="values__cnt">
-                                            9/10
-                                        </div>
-                                    </div>
-                                    <div class="link">
-                                        <div>Подробнее</div>
-                                    </div>
-                                </div>
-                                <div class="card__body_ex">
-                                    <div class="head">
-                                        В категориях
-                                    </div>
-                                    <ul class="list">
-                                        <li class="list__item">— для сердца и сосудов</li>
-                                        <li class="list__item">— для геникологии и акушерства</li>
-                                        <li class="list__item">— 3d/4d аппараты</li>
-                                    </ul>
-                                    <div class="action">
-                                        <button>
-                                            Консультация в один клик
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
+                                        <div class="card__body">
+                                            <div class="card__body_main">
+                                                <div class="name"><?= $product->get_title() ?></div>
+                                                <div class="values">
+                                                    <div class="values__price">
+                                                        от <?php echo $product->get_regular_price() . ' ' . get_woocommerce_currency_symbol( $currency = '' ); ?>
+                                                    </div>
+                                                    <div class="values__cnt">
+                                                        <?php if ( !empty($rating) ): ?><span><?= $rating ?>/10</span><?php else: ?><span>0/10</span><?php endif; ?>
+                                                    </div>
+                                                </div>
+                                                <div class="link">
+                                                    <div>Подробнее</div>
+                                                </div>
+                                            </div>
+                                            <div class="card__body_ex">
+                                                <div class="head">
+                                                    В категориях
+                                                </div>
+                                                <ul class="list">
+                                                    <?php
+                                                    foreach ( $product_attributes as $attribute_item ):
+                                                        foreach (wc_get_product_terms( $product->get_id(), $attribute_item->get_data()['name'], array( 'taxonomy' =>  'sensor-frequencies' ) ) as $value): ?>
+                                                            <?php
+                                                            if ( $value->taxonomy === 'pa_application-area' ):
+                                                                echo '<li class="list__item">— ' . $value->name . '</li>';
+                                                            endif;
 
-                        </a>
-                        <a href="#" class="search__list_item card">
-                            <div class="card__img">
-                                <picture>
-                                    <source srcset="" type="image/webp">
-                                    <img src="./img/card/card.png" alt="">
-                                </picture>
-                            </div>
-                            <div class="card__body">
-                                <div class="card__body_main">
-                                    <div class="name">Philips SE 310</div>
-                                    <div class="values">
-                                        <div class="values__price">
-                                            от 2 800 000 ₽
-                                        </div>
-                                        <div class="values__cnt">
-                                            9/10
-                                        </div>
-                                    </div>
-                                    <div class="link">
-                                        <div>Подробнее</div>
-                                    </div>
-                                </div>
-                                <div class="card__body_ex">
-                                    <div class="head">
-                                        В категориях
-                                    </div>
-                                    <ul class="list">
-                                        <li class="list__item">— для сердца и сосудов</li>
-                                        <li class="list__item">— для геникологии и акушерства</li>
-                                        <li class="list__item">— 3d/4d аппараты</li>
-                                    </ul>
-                                    <div class="action">
-                                        <button>
-                                            Консультация в один клик
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
+                                                            if ( $value->taxonomy === 'pa_suitable-device' && is_product_category(48) ) {
+                                                                echo '<li class="list__item">— ' . $value->name . '</li>';
+                                                            }
 
-                        </a>
-                        <a href="#" class="search__list_item card">
-                            <div class="card__img">
-                                <picture>
-                                    <source srcset="" type="image/webp">
-                                    <img src="./img/card/card.png" alt="">
-                                </picture>
-                            </div>
-                            <div class="card__body">
-                                <div class="card__body_main">
-                                    <div class="name">Philips SE 310</div>
-                                    <div class="values">
-                                        <div class="values__price">
-                                            от 2 800 000 ₽
+                                                            ?>
+                                                        <?php endforeach;
+                                                    endforeach; ?>
+                                                </ul>
+                                                <div class="action">
+                                                    <button>
+                                                        Консультация в один клик
+                                                    </button>
+                                                </div>
+                                            </div>
                                         </div>
-                                        <div class="values__cnt">
-                                            9/10
+                                    </a>
+                                <?php elseif ( $post->post_type == 'post' ) : ?>
+                                    <a href="<?= get_permalink($post->ID) ?>" class="search__list_item art">
+                                        <div class="art__img">
+                                            <picture>
+                                                <source srcset="" type="image/webp">
+                                                <img
+                                                    src="<?= get_the_post_thumbnail($post->ID) ?>"
+                                                    alt="<?php $post->post_title ?>"
+                                                >
+                                            </picture>
                                         </div>
-                                    </div>
-                                    <div class="link">
-                                        <div>Подробнее</div>
-                                    </div>
-                                </div>
-                                <div class="card__body_ex">
-                                    <div class="head">
-                                        В категориях
-                                    </div>
-                                    <ul class="list">
-                                        <li class="list__item">— для сердца и сосудов</li>
-                                        <li class="list__item">— для геникологии и акушерства</li>
-                                        <li class="list__item">— 3d/4d аппараты</li>
-                                    </ul>
-                                    <div class="action">
-                                        <button>
-                                            Консультация в один клик
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-
-                        </a>
-                        <a href="#" class="search__list_item art">
-                            <div class="art__img">
-                                <picture>
-                                    <source srcset="" type="image/webp">
-                                    <img src="./img/prod/exmaple.png" alt="">
-                                </picture>
-                            </div>
-                            <div class="art__body">
-                                <div class="art__body_name">Рейтинг лучших УЗИ аппаратов. ТОП 15 популярных</div>
-                                <div class="art__body_info">
-                                    <div class="art__body_info_item art__body_info_item-rep">(4)</div>
-                                    <div class="art__body_info_item art__body_info_item-sn">(13 324)</div>
-                                </div>
-                            </div>
-                        </a>
+                                        <div class="art__body">
+                                            <div class="art__body_name"><?= $post->post_title ?></div>
+                                            <div class="art__body_info">
+                                                <div class="art__body_info_item art__body_info_item-rep">(<?= get_comments_number($post->ID) ?>)</div>
+                                                <div class="art__body_info_item art__body_info_item-sn">(<?= get_post_views($post->ID) ?>)</div>
+                                            </div>
+                                        </div>
+                                    </a>
+                                <?php
+                                endif;
+                            endforeach;
+                        endforeach;
+                        ?>
                     </div>
                 </div>
             </div>
         </section>
     </main>
+
 <?php
 get_footer();

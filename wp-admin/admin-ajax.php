@@ -41,6 +41,10 @@ require_once ABSPATH . 'wp-admin/includes/ajax-actions.php';
 send_nosniff_header();
 nocache_headers();
 
+require_once ABSPATH . 'wp-admin/includes/media.php';
+require_once ABSPATH . 'wp-admin/includes/file.php';
+require_once ABSPATH . 'wp-admin/includes/image.php';
+
 /** This action is documented in wp-admin/admin.php */
 do_action( 'admin_init' );
 
@@ -171,6 +175,12 @@ add_action( 'wp_ajax_nopriv_heartbeat', 'wp_ajax_nopriv_heartbeat', 1 );
 add_action( 'wp_ajax_post_user_request', 'post_user_request' );
 add_action( 'wp_ajax_nopriv_post_user_request', 'post_user_request' );
 
+add_action('wp_ajax_post_registration_vendor', 'post_registration_vendor');
+add_action('wp_ajax_nopriv_post_registration_vendor', 'post_registration_vendor');
+
+add_action('wp_ajax_post_add_reply', 'post_add_reply');
+add_action('wp_ajax_nopriv_post_add_reply', 'post_add_reply');
+
 $action = $_REQUEST['action'];
 
 if ( is_user_logged_in() ) {
@@ -217,6 +227,64 @@ function post_user_request() {
     }
 
     wp_die($status);
+}
+
+function post_registration_vendor() {
+    $uploaddir =  '../files-manager/';
+
+    if( ! is_dir( $uploaddir ) ) mkdir( $uploaddir, 775 );
+
+    $files      = $_FILES;
+    $done_files = [];
+    $status = '';
+
+    foreach( $files as $file ){
+        $file_name = $file['name'];
+
+        if( move_uploaded_file( $file['tmp_name'], "$uploaddir/$file_name" ) ){
+            $done_files[] = realpath( "$uploaddir/$file_name" );
+        }
+    }
+
+    $vendor_img = str_replace('\\', "/", $done_files[0]);
+
+    $vendor_id = wp_insert_post([
+        'post_type' => 'vendors',
+        'post_title' => $_POST['name'],
+        'post_content' => $_POST['desc']
+    ]);
+    $img_tag = '';
+    if ( $vendor_id ) {
+        $img_tag = media_sideload_image($vendor_img, $vendor_id, 'Логотип '.$_POST['name']);
+        $status = 'ok';
+    } else {
+        $status = 'error';
+    }
+
+    echo json_encode($status);
+
+    wp_die();
+}
+
+function post_add_reply() {
+    $status = 'error';
+
+    if ( $_POST['data'] ) {
+        $data = array(
+            'comment_post_ID'      => $_GET['post_id'],
+            'comment_content'      => $_POST['data']['text'],
+            'comment_parent'       => $_GET['comment_reply_id'],
+            'comment_author'       => $_POST['data']['name'],
+            'comment_author_email' => $_POST['data']['email'],
+        );
+
+        $comment_id = wp_insert_comment( $data );
+        if ( ! is_wp_error( $comment_id ) ) {
+            $status = 'ok';
+        }
+    }
+
+    wp_die(json_encode($status));
 }
 
 // Default status.

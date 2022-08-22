@@ -1099,3 +1099,53 @@ function filter_articles_by_views() {
 }
 add_action('wp_ajax_filter_articles_by_views', 'filter_articles_by_views');
 add_action('wp_ajax_nopriv_filter_articles_by_views', 'filter_articles_by_views');
+
+function get_comment_replies($comment_id=0,$args=array()) {
+    $args = wp_parse_args($args,array(
+        'post_id'=>0,
+        'orderby'=>'comment_parent',
+        'order'=>'ASC',
+    ));
+    extract($args);
+    if (is_numeric($comment_id) && $comment_id>0 && !$post_id) {
+        $comment = get_comment($comment_id);
+        $post_id = $comment->comment_post_ID;
+    }
+    if (!$post_id && !is_numeric($comment_id) && $comment_id!='all') {
+        wp_die('get_comment_replies() will not parse all comments unless explicitly requested.');
+    }
+    $comments = get_comments($args);
+    $replies = array();
+    foreach($comments as $comment) {
+        $comment->reply_count = 0;
+        $comment->replies = array();
+        $replies[$comment->comment_ID] = $comment;
+        if ($comment_id==$comment->comment_ID)
+            $this_comment = $comment;
+        if ($comment->comment_parent) {
+            if (!isset($replies[$comment->comment_parent]->replies))
+                $replies[$comment->comment_parent]->replies = array();
+            $replies[$comment->comment_parent]->replies[$comment->comment_ID] = $comment;
+        }
+    }
+    $children = array();
+    $count = 0;
+    if ($comment_id>0) {
+        $this_comment->reply_count = _count_comment_replies($replies,$comment_id);
+        $this_comment->replies = $replies[$comment_id]->replies;
+        $replies = $this_comment;
+    }
+    return $replies;
+}
+
+function _count_comment_replies(&$replies,$comment_id) {
+    $count = 0;
+    if (count($replies[$comment_id]->replies)>0) {
+        $count = count($replies[$comment_id]->replies);
+        foreach($replies[$comment_id]->replies as $index => $reply) {
+            $count += _count_comment_replies($replies,$reply->comment_ID);
+        }
+        $replies[$comment_id]->reply_count = $count;
+    }
+    return $count;
+}

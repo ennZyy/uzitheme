@@ -1,5 +1,58 @@
 jQuery(document).ready(function ($) {
 
+    function cmAnswer() {
+        const commentBtns = document.querySelectorAll('.comment-answer-btn');
+
+        const answer = document.createElement('form');
+        answer.classList.add('prod__comment_body');
+
+        answer.classList.add('prod__replyto-form');
+
+        answer.innerHTML = `
+        <div class="prod__comment_body_h">
+        Написать с помощью +
+        </div>
+        <div class="prod__comment_body_inp">
+            <input type="text" placeholder="Имя" name="name">
+        </div>
+        <div class="prod__comment_body_inp">
+            <input type="email" placeholder="Email" name="email">
+            <div class="prod__comment_body_inp_ex">*Email будет скрыт </div>
+        </div>
+        <div class="prod__comment_body_text">
+            <textarea placeholder="Комментарий..." name="text"></textarea>
+        </div>
+        <div class="prod__comment_body_action">
+            <button class="prod__comment_body_action_btn answer__btn">Отправить</button>
+        </div>`;
+
+        if (commentBtns.length > 0) {
+            commentBtns.forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    btn.parentElement.parentElement.classList.remove('active');
+
+                    e.target.parentElement.parentElement.classList.toggle('active');
+
+                    if (btn.parentElement.parentElement.classList.contains('active')) {
+                        btn.parentElement.parentElement.append(answer);
+                    }
+                    if (!btn.parentElement.parentElement.classList.contains('active') && btn.parentElement.nextElementSibling) {
+                        btn.parentElement.parentElement.removeChild(btn.parentElement.nextElementSibling);
+                    }
+                })
+            })
+        }
+    }
+
+    function objectifyForm(formArray) {//serialize data function
+
+        var returnArray = {};
+        for (var i = 0; i < formArray.length; i++){
+            returnArray[formArray[i]['name']] = formArray[i]['value'];
+        }
+        return returnArray;
+    }
+
     $('.prod__review-form').on('submit', function (e) {
         e.preventDefault();
 
@@ -16,25 +69,30 @@ jQuery(document).ready(function ($) {
         })
     })
 
-    $('.prod__replyto-form').on('submit', function (e) {
-        e.preventDefault();
+    $('.comment-answer-btn').on('click', cmAnswer())
 
-        let commentId = $('input[name="comment_id"]').val(),
-            postId    = $('input[name="product_id"]').val(),
-            str       = "div-comment-"+commentId;
+    $(document).on('submit', '.prod__replyto-form', function (e) {
+        e.preventDefault()
 
-        $('.answer__btn').data('commentid', commentId);
-        $('.answer__btn').data('belowelement', str);
-        $('.answer__btn').data('postid', postId);
+        let commentID = $(this).siblings('div.action').find('button.comment-answer-btn').data('comment'),
+            formData = $(this).serializeArray(),
+            productId = $('input[name="product_id"]').val()
+            data = {};
+
+        $(formData).each(function(index, obj){
+            data[obj.name] = obj.value;
+        });
 
         $.ajax({
             type: 'POST',
-            url: '/?replytocom='+commentId+'#respond',
-            data: $(this).serialize(),
+            url: ajax_url['url'] + '/?comment_reply_id=' + commentID + '&post_id=' + productId,
+            data: {
+                'action': 'post_add_reply',
+                'data' : data
+            },
             success: function (response) {
                 console.log(response)
             }
         })
     })
 })
-
