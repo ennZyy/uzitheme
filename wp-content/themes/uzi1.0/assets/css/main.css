@@ -19,16 +19,10 @@
   --swiper-theme-color:#007aff;
 }
 
-#wpadminbar {
-  display: block;
-}
+#wpadminbar { display:block !important; }
 
 .wrapper {
   overflow-x: clip !important;
-}
-
-.woocommerce-products-header__title {
-  display: none !important;
 }
 
 body {
@@ -4929,4 +4923,12 @@ body {
   opacity: 0;
   height: 0;
   visibility: hidden;
+}
+
+.filter__item-reset {
+  font-weight: 400;
+  font-size: 20px;
+  line-height: 130%;
+  color: #5C82E4;
+  cursor: pointer;
 }

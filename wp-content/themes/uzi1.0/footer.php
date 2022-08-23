@@ -2,9 +2,6 @@
 $footer_settings = get_field('footer_settings', 'option');
 
 $phone = str_replace(array('+', ' ', '(' , ')', '-'), '', $footer_settings['contacts']['phone']);
-//echo '<pre>';
-//print_r($footer_settings);
-//echo '</pre>';
 ?>
 
 <footer class="footer">
@@ -103,7 +100,6 @@ $phone = str_replace(array('+', ' ', '(' , ')', '-'), '', $footer_settings['cont
     </div>
 </footer>
 
-</div>
 <div class="addc">
     <form class="addc__body" id="registrationVendor">
         <button type="button" class="addc__body_close">

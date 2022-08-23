@@ -12,7 +12,7 @@ if ( ! defined( '_S_VERSION' ) ) {
 	define( '_S_VERSION', '2.1' );
 }
 
-if ( ! function_exists( 'bpsd_setup' ) ) :
+if ( ! function_exists( 'uzi_setup' ) ) :
 	/**
 	 * Sets up theme defaults and registers support for various WordPress features.
 	 *
@@ -20,14 +20,14 @@ if ( ! function_exists( 'bpsd_setup' ) ) :
 	 * runs before the init hook. The init hook is too late for some features, such
 	 * as indicating support for post thumbnails.
 	 */
-	function bpsd_setup() {
+	function uzi_setup() {
 		/*
 		 * Make theme available for translation.
 		 * Translations can be filed in the /languages/ directory.
 		 * If you're building a theme based on BPSD, use a find and replace
 		 * to change 'bpsd' to the name of your theme in all the template files.
 		 */
-		load_theme_textdomain( 'bpsd', get_template_directory() . '/languages' );
+		load_theme_textdomain( 'uzi', get_template_directory() . '/languages' );
 
 		// Add default posts and comments RSS feed links to head.
 		add_theme_support( 'automatic-feed-links' );
@@ -50,7 +50,7 @@ if ( ! function_exists( 'bpsd_setup' ) ) :
 		// This theme uses wp_nav_menu() in one location.
 		register_nav_menus(
 			array(
-				'menu-1' => esc_html__( 'Primary', 'bpsd' ),
+				'menu-1' => esc_html__( 'Primary', 'uzi' ),
 			)
 		);
 
@@ -75,7 +75,7 @@ if ( ! function_exists( 'bpsd_setup' ) ) :
 		add_theme_support(
 			'custom-background',
 			apply_filters(
-				'bpsd_custom_background_args',
+				'uzi_custom_background_args',
 				array(
 					'default-color' => 'ffffff',
 					'default-image' => '',
@@ -102,7 +102,7 @@ if ( ! function_exists( 'bpsd_setup' ) ) :
 		);
 	}
 endif;
-add_action( 'after_setup_theme', 'bpsd_setup' );
+add_action( 'after_setup_theme', 'uzi_setup' );
 
 /**
  * Set the content width in pixels, based on the theme's design and stylesheet.
@@ -111,22 +111,22 @@ add_action( 'after_setup_theme', 'bpsd_setup' );
  *
  * @global int $content_width
  */
-function bpsd_content_width() {
-	$GLOBALS['content_width'] = apply_filters( 'bpsd_content_width', 640 );
+function uzi_content_width() {
+	$GLOBALS['content_width'] = apply_filters( 'uzi_content_width', 640 );
 }
-add_action( 'after_setup_theme', 'bpsd_content_width', 0 );
+add_action( 'after_setup_theme', 'uzi_content_width', 0 );
 
 /**
  * Register widget area.
  *
  * @link https://developer.wordpress.org/themes/functionality/sidebars/#registering-a-sidebar
  */
-function bpsd_widgets_init() {
+function uzi_widgets_init() {
 	register_sidebar(
 		array(
-			'name'          => esc_html__( 'Sidebar', 'bpsd' ),
+			'name'          => esc_html__( 'Sidebar', 'uzi' ),
 			'id'            => 'sidebar-1',
-			'description'   => esc_html__( 'Add widgets here.', 'bpsd' ),
+			'description'   => esc_html__( 'Add widgets here.', 'uzi' ),
 			'before_widget' => '<section id="%1$s" class="widget %2$s">',
 			'after_widget'  => '</section>',
 			'before_title'  => '<h2 class="widget-title">',
@@ -134,7 +134,7 @@ function bpsd_widgets_init() {
 		)
 	);
 }
-add_action( 'widgets_init', 'bpsd_widgets_init' );
+add_action( 'widgets_init', 'uzi_widgets_init' );
 
 /**
  * Enqueue scripts and styles.
@@ -190,7 +190,6 @@ require get_template_directory() . '/inc/customizer.php';
 if ( defined( 'JETPACK__VERSION' ) ) {
 	require get_template_directory() . '/inc/jetpack.php';
 }
-
 
 require get_template_directory() . '/inc/custom-post-type.php';
 require get_template_directory() . '/inc/category-functions.php';
@@ -730,6 +729,30 @@ function get_vendor_product($vendor_id) {
     return $vendor_products;
 }
 
+function get_count_vendor_product_apparatus ($vendor_id) {
+    $vendor_products = [];
+    $all_products = new WP_Query([
+        'post_type'              => array( 'product' ),
+        'post_status'            => array( 'publish' ),
+        'tax_query'              => [
+            'taxonomy' => 'product_cat',
+            'field' => 'term_id',
+            'terms' => 47,
+            'operator' => 'IN'
+        ],
+    ]);
+
+    foreach ( $all_products->posts as $product ) {
+        $product_meta = get_post_meta($product->ID);
+
+        if ( isset($product_meta['product_vendor']) && !empty($product_meta['product_vendor']) && $product_meta['product_vendor'][0] == $vendor_id ) {
+            $vendor_products[] = $product;
+        }
+    }
+
+    return count($vendor_products);
+}
+
 function add_user_contact_page() {
     add_menu_page(
         'Заявки пользователей',
@@ -1148,4 +1171,71 @@ function _count_comment_replies(&$replies,$comment_id) {
         $replies[$comment_id]->reply_count = $count;
     }
     return $count;
+}
+
+add_filter( 'woocommerce_subcategory_count_html', 'true_category_price_range', 25, 2 );
+
+function true_category_price_range( $product_category ) {
+    $result = '';
+    $product_ids = get_posts( array(
+        'post_type' => 'product',
+        'posts_per_page' => -1,
+        'post_status' => 'publish',
+        'fields' => 'ids',
+        'tax_query' => array(
+            'relation' => 'AND',
+            array(
+                'taxonomy' => 'product_cat',
+                'field' => 'slug',
+                'terms' => $product_category,
+            ),
+            array(
+                'taxonomy' => 'product_visibility',
+                'field' => 'name',
+                'terms' => 'exclude-from-catalog',
+                'operator' => 'NOT IN',
+            ),
+        )
+    ) );
+
+    // если товаров в категории нет, то возвращаем ничего
+    if( ! $product_ids ) {
+        return;
+    }
+
+    // окей, товары значит есть, пройдёмся по ним циклом и вычислим минимальное и максимальное значение
+    $min = PHP_FLOAT_MAX;
+    $max = 0;
+
+    foreach ( $product_ids as $product_id ) {
+        // получим объект товара из его ID
+        $product = wc_get_product( $product_id );
+        // если товар простой
+        if ( $product->is_type( 'simple' ) ) {
+            // получаем цену
+            $product_price = $product->get_price();
+            // вычисляем минимальное
+            $min = $product_price < $min ? $product_price : $min;
+            // вычисляем максимальное
+            $max = $product_price > $max ? $product_price : $max;
+
+            // если товар вариативный, то тут можно слегка заморочиться
+        } elseif ( $product->is_type( 'variable' ) ) {
+            // получаем массив цен вариаций этого товара, уже отсортированных!
+            $prices = $product->get_variation_prices();
+            // вычисляем минимальное
+            $min = current( $prices[ 'price' ] ) < $min ? current( $prices[ 'price' ] ) : $min;
+            // вычисляем максимальное
+            $max = end( $prices[ 'price' ] ) > $max ? end( $prices[ 'price' ] ) : $max;
+        }
+    }
+
+    // финальная проверка, если существуют мин и макс, то выводим
+    if( $min && $max ) {
+        $result = [
+            'min'   => $min,
+            'max'   => $max
+        ];
+        return $result;
+    }
 }
