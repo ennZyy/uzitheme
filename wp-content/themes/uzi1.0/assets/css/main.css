@@ -2360,7 +2360,7 @@ body {
 .best__list {
   display: flex;
   align-items: flex-start;
-  justify-content: space-between;
+  justify-content: flex-start;
   width: 100%;
   flex-wrap: wrap;
 }
@@ -3207,6 +3207,7 @@ body {
   cursor: pointer;
   position: relative;
   padding-right: 32px;
+  text-align: end;
 }
 .prod__descr_item_head_btn:after {
   position: absolute;
@@ -4909,7 +4910,7 @@ body {
 }
 .rtg__body img {
   width: 100%;
-  height: 100%;
+  max-height: 100%;
   object-fit: contain;
   border-radius: 10px;
 }

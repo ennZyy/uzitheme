@@ -39,9 +39,9 @@ get_header();
                     );?>
                 </div>
                 <div class="vendors__in">
-                    <h2 class="vendors__head">
+                    <h1 class="vendors__head">
                         Производители
-                    </h2>
+                    </h1>
                     <div class="vendors__list">
                         <?php foreach ( $vendors as $vendor ): ?>
                             <div class="vendors__item">

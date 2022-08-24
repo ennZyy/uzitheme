@@ -21,12 +21,6 @@ if ( ! function_exists( 'uzi_setup' ) ) :
 	 * as indicating support for post thumbnails.
 	 */
 	function uzi_setup() {
-		/*
-		 * Make theme available for translation.
-		 * Translations can be filed in the /languages/ directory.
-		 * If you're building a theme based on BPSD, use a find and replace
-		 * to change 'bpsd' to the name of your theme in all the template files.
-		 */
 		load_theme_textdomain( 'uzi', get_template_directory() . '/languages' );
 
 		// Add default posts and comments RSS feed links to head.
@@ -1238,4 +1232,161 @@ function true_category_price_range( $product_category ) {
         ];
         return $result;
     }
+}
+
+add_shortcode( 'heading', 'heading_shortcode_handler' );
+function heading_shortcode_handler( $atts ){
+    $rg = (object) shortcode_atts( [
+        'text' => '',
+    ], $atts );
+
+    $out = '
+	<div class="prod__descr_item_head">
+        <h3 class="prod__descr_item_head_title">'.$rg->text.'</h3>
+        <button class="prod__descr_item_head_btn">Скрыть</button>
+    </div>
+	';
+
+    return $out;
+}
+
+add_shortcode( 'textwithimage', 'textwithimage_shortcode_handler' );
+function textwithimage_shortcode_handler( $atts ){
+    $rg = (object) shortcode_atts( [
+        'text' => '',
+        'imgurl'=>'',
+        'imgtext'=>''
+    ], $atts );
+
+    $out = '
+	<div class="prod__descr_item_body">
+                                <div class="text">
+                                '. $rg->text .'
+                                </div>
+                                <div class="usf">
+                                    <div class="usf__img">
+                                        <picture>
+                                            <source srcset="" type="image/webp">
+                                            <img src="'. $rg->imgurl .'" alt="">
+                                        </picture>
+                                    </div>
+                                    <div class="usf__body">
+                                        '. $rg->imgtext .'
+                                    </div>
+                                </div>
+                            </div>
+	';
+
+    return $out;
+}
+
+add_shortcode( 'productrating', 'product_rating_shortcode_handler' );
+function product_rating_shortcode_handler( $atts ){
+    $rg = (object) shortcode_atts( [
+        'id' => '',
+        'place'=>''
+    ], $atts );
+
+    $product = wc_get_product($rg->id);
+    $attachment_ids = $product->get_gallery_image_ids();
+    $images = '';
+
+    foreach( $attachment_ids as &$attachment_id ) {
+        $attachment_id = wp_get_attachment_image_url( $attachment_id, [530, 581], '$icon' );
+    }
+
+    foreach ($attachment_ids as $attachment_id) {
+        $url = $attachment_id;
+        $images .= '
+        <div class="prod__main_thumbs_sl swiper-slide">
+                                                    <picture>
+                                                        <source srcset="" type="image/webp">
+                                                        <img src="'. $url .'" alt="'.$product->get_title().'">
+                                                    </picture>
+                                                </div>
+        ';
+    }
+
+    $out = '
+	<div class="prod__descr_item active" id="rateProd">
+                            <div class="prod__descr_item_head">
+                                <div class="prod__descr_item_head_title">
+                                    '.$rg->place.'
+                                </div>
+                                <div class="prod__descr_item_head_btn">
+                                    Скрыть
+                                </div>
+                            </div>
+                            <div class="prod__descr_item_body">
+                                <div class="prod__main">
+
+                                    <div class="prod__main_content">
+                                        <div class="prod__main_thumbs swiper">
+                                            <div class="prod__main_thumbs_wr swiper-wrapper">
+                                                '. $images .'
+                                            </div>
+
+                                            <div class="prod__main_thumbs_prev">
+                                                <svg width="18" height="10" viewBox="0 0 18 10" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                    <path d="M1.50019 9.73123C1.16174 10.0794 0.600522 10.0847 0.255384 9.74304C-0.0786183 9.41239 -0.0859278 8.87856 0.238899 8.53907L8.13756 0.283686C8.49272 -0.0875205 9.08726 -0.0954989 9.45246 0.266041C9.80593 0.615962 9.81141 1.1816 9.46478 1.53817L1.50019 9.73123Z" fill="#2F2F2F"/>
+                                                    <path d="M17.7456 8.53188C18.0848 8.86773 18.0848 9.41226 17.7456 9.74811C17.4063 10.084 16.8563 10.084 16.517 9.74811L8.53146 1.84259C8.19221 1.50674 8.19221 0.962209 8.53146 0.626355C8.87072 0.290501 9.42076 0.290501 9.76001 0.626355L17.7456 8.53188Z" fill="#2F2F2F"/>
+                                                </svg>
+
+                                            </div>
+                                            <div class="prod__main_thumbs_next">
+                                                <svg width="18" height="10" viewBox="0 0 18 10" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                    <path d="M16.4998 0.268772C16.8383 -0.0793941 17.3995 -0.0847205 17.7446 0.256958C18.0786 0.587613 18.0859 1.12144 17.7611 1.46093L9.86244 9.71631C9.50728 10.0875 8.91274 10.0955 8.54754 9.73396C8.19407 9.38404 8.18859 8.8184 8.53522 8.46183L16.4998 0.268772Z" fill="#2F2F2F"/>
+                                                    <path d="M0.254442 1.46812C-0.0848122 1.13227 -0.0848122 0.587743 0.254442 0.25189C0.593695 -0.0839642 1.14373 -0.0839641 1.48299 0.25189L9.46854 8.15741C9.80779 8.49326 9.80779 9.03779 9.46854 9.37364C9.12928 9.7095 8.57924 9.7095 8.23999 9.37364L0.254442 1.46812Z" fill="#2F2F2F"/>
+                                                </svg>
+
+                                            </div>
+                                        </div>
+                                        <div class="prod__main_slider swiper">
+                                            <div class="prod__main_slider_wr swiper-wrapper">
+                                                '. $images .'
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+	';
+
+    return $out;
+}
+
+add_shortcode( 'producttext', 'product_text_shortcode_handler' );
+function product_text_shortcode_handler( $atts ){
+    extract( shortcode_atts( [
+        'description'=>'',
+        'important'=>'',
+        'ref'=>''
+    ], $atts ));
+
+    $out = '
+	<div class="prod__descr_item active">
+                                <div class="prod__descr_item_body">
+                                    <div class="text">
+                                        '. $description .'
+                                    </div>
+                                    <div class="spr">
+                                        <div class="spr__item spr__main">
+                                            <div class="spr__item_head">Важно</div>
+                                            <div class="spr__item_body">
+                                             '. $important .'
+                                            </div>
+                                        </div>
+                                        <div class="spr__item spr__wr">
+                                            <div class="spr__item_head">Справка</div>
+                                            <div class="spr__item_body">
+                                            '. $ref .'
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+	';
+
+    return $out;
 }

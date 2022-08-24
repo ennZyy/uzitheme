@@ -73,7 +73,7 @@ get_header();
                     <aside class="filter">
                         <div class="filter__in">
                             <div class="filter__head">
-                                <h2 class="filter__head_title">Фильтр</h2>
+                                <h1 class="filter__head_title">Фильтр</h1>
 
                                 <button class="filter__head_btn">
                                     <svg width="15" height="15" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -170,29 +170,7 @@ get_header();
                                         <?php endforeach; ?>
                                     </div>
                                     <?php endfor; ?>
-                                    <div class="filter__item_body filter__item_body-hide">
-                                        <div class="filter__item_body_item">
-                                            <input id="f2-7" type="checkbox" name="f2">
-                                            <label for="f2-7">
-                                                <div class="icon"></div>
-                                                <div class="text">Для акушерства и гинекологии <span>(54)</span></div>
-                                            </label>
-                                        </div>
-                                        <div class="filter__item_body_item">
-                                            <input id="f2-8" type="checkbox" name="f2">
-                                            <label for="f2-8">
-                                                <div class="icon"></div>
-                                                <div class="text">Для сердца и сосудов <span>(33)</span></div>
-                                            </label>
-                                        </div>
-                                        <div class="filter__item_body_item">
-                                            <input id="f2-9" type="checkbox" name="f2">
-                                            <label for="f2-9">
-                                                <div class="icon"></div>
-                                                <div class="text">Универсальные <span>(14)</span></div>
-                                            </label>
-                                        </div>
-                                    </div>
+
                                     <div class="filter__item_btn">
                                         <button class="filterToggler">показать еще</button>
                                     </div>

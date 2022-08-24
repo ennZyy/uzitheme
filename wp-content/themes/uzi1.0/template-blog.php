@@ -9,8 +9,6 @@ $wpb_all_query = new WP_Query(
             'order' => 'DESC',
             'posts_per_page'=>'12'));
 
-$post_count = wp_count_posts( 'post' );
-
 get_header();
 ?>
 
@@ -30,9 +28,9 @@ get_header();
                     );?>
                 </div>
                 <div class="articles__in">
-                    <h2 class="articles__head">
+                    <h1 class="articles__head">
                         Статьи
-                    </h2>
+                    </h1>
                     <div class="articles__filter">
                         <label for="filterView">
                             <button class="articles__filter_item articles__filter-views" name="filterView">Фильтровать по просмотрам</button>
@@ -65,7 +63,7 @@ get_header();
                         <?php wp_reset_postdata(); ?>
                         <?php endif; ?>
                     </div>
-                    <?php if ($wpb_all_query->max_num_pages >= 1) : ?>
+                    <?php if ($wpb_all_query->max_num_pages > 1) : ?>
                         <div class="articles__action">
                             <script>
                                 var posts_vars = '<?php echo serialize($wpb_all_query->query_vars); ?>';

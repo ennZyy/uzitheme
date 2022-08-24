@@ -3,6 +3,21 @@
 $query = get_search_query();
 $sentence = $_GET['sentence'];
 $search_types = explode(',', $_GET['post_type']);
+$result_str = ' Поиск по фразе ' . '<span>“' . get_search_query() . '”</span>';
+foreach ( $search_types as $type ) {
+    $posts = new WP_Query(
+        [
+            'post_type' => $type,
+            'order'     => 'DESC',
+            's'         => $query,
+            'sentence'  => $sentence
+        ]
+    );
+
+    if ( empty($nothing_str) ) {
+        $result_str = ' Поиск по фразе ' . '<span>“' . get_search_query() . '” ничего не найдено</span>';
+    }
+}
 
 get_header();
 ?>
@@ -23,10 +38,10 @@ get_header();
                     );?>
                 </div>
                 <div class="search__in">
-                    <div class="search__head">
-                        <?php printf( esc_html__( ' Поиск по фразе «%s»', 'uzi' ), '<span>' . get_search_query() . '</span>' ); ?>
-                    </div>
                     <div class="search__list">
+                        <div class="search__head">
+                            <?= $result_str ?>
+                        </div>
 
                         <?php foreach ( $search_types as $type ):
                             $posts = new WP_Query(
@@ -37,6 +52,11 @@ get_header();
                                     'sentence'  => $sentence
                                 ]
                             );
+
+                            if ( empty($post) ) {
+                                $nothing = "ничего не найдено";
+                                break;
+                            }
 
                             foreach ( $posts->posts as $post ):
                                 if ( $post->post_type == 'product' ):

@@ -64,7 +64,7 @@ $about_us_settings = get_field('aboutus_settings');
                                 $block_class = match ($i) {
                                     0 => 'hero__body_col_left',
                                     1 => 'hero__body_col_mid',
-                                    2 => 'hero__body_col_right',
+                                    2 => 'hero__body_col_right'
                                 };
 
                                 ?>
@@ -85,7 +85,7 @@ $about_us_settings = get_field('aboutus_settings');
                                         $name = get_the_category_by_ID($category_id);
                                         $product_count = get_term( $category_id, 'product_cat' );
                                         ?>
-                                        <a href="<?php echo get_category_link($category_id); ?>" class="item w-l" style="background-image: url('<?= $image ?>');">
+                                        <a href="/product-category/ultrasound-machines/" class="item w-l" style="background-image: url('<?= $image ?>');">
                                             <div class="item__value"><?= $name ?> <span>(<?= $product_count->count ?>)</span></div>
                                         </a>
                                     <?php endforeach; ?>
@@ -95,9 +95,9 @@ $about_us_settings = get_field('aboutus_settings');
                             ?>
                         </div>
 
-                        <div class="hero__body_action">
-                            <button>Показать еще</button>
-                        </div>
+<!--                        <div class="hero__body_action">-->
+<!--                            <button>Показать еще</button>-->
+<!--                        </div>-->
 
                     </div>
                 </div>
@@ -351,7 +351,7 @@ $about_us_settings = get_field('aboutus_settings');
                         ));
                         if ($featured->have_posts()) :
                             ?>
-                            <div class="best__list">
+                            <div class="best__ap-list best__list">
                                 <?php while ($featured->have_posts()):
                                     $featured->the_post();
                                     get_template_part('template-parts/second-product', 'card');
