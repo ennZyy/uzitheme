@@ -14,18 +14,18 @@ RewriteRule . /index.php [L]
 # END WordPress
 
 #без www
-RewriteCond %{HTTP_HOST} ^www\.(.*)$
-RewriteRule ^(.*)$ http://%1/$1 [L,R=301]
+#RewriteCond %{HTTP_HOST} ^www\.(.*)$
+#RewriteRule ^(.*)$ http://%1/$1 [L,R=301]
 
 #без слеша
-RewriteCond %{REQUEST_URI} !\?
-RewriteCond %{REQUEST_URI} !\&
-RewriteCond %{REQUEST_URI} !\=
-RewriteCond %{REQUEST_URI} !\.
-RewriteCond %{REQUEST_URI} ![^\/]$
-RewriteRule ^(.*)\/$ /$1 [R=301,L]
+#RewriteCond %{REQUEST_URI} !\?
+#RewriteCond %{REQUEST_URI} !\&
+#RewriteCond %{REQUEST_URI} !\=
+#RewriteCond %{REQUEST_URI} !\.
+#RewriteCond %{REQUEST_URI} ![^\/]$
+#RewriteRule ^(.*)\/$ /$1 [R=301,L]
 
 #с http на https
-RewriteCond %{HTTPS} off
-RewriteCond %{HTTP:X-Forwarded-Proto} !https
-RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+#RewriteCond %{HTTPS} off
+#RewriteCond %{HTTP:X-Forwarded-Proto} !https
+#RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]

@@ -359,52 +359,6 @@ get_header();
                                             endforeach;
                                         ?>
                                     </div>
-                                    <div class="sensors__list-hide">
-                                        <div class="sensors__list_item">
-                                            <div class="img">
-                                                <picture>
-                                                    <source srcset="" type="image/webp">
-                                                    <img src="<?php echo get_template_directory_uri() ?>/assets/img/prod/sensor.png" alt="">
-                                                </picture>
-                                            </div>
-                                            <div class="body">
-                                                <a href="#" class="body__name">
-                                                    Конвексный датчик Mindray C7-3E
-                                                </a>
-                                                <div class="body__info">
-                                                    2,2-8,1 МГц | высокоплотный
-                                                </div>
-                                                <div class="body__info">
-                                                    Абдоминальные исследования, акушерство и гинекология.
-                                                </div>
-                                                <div class="body__info">
-                                                    от 1 200 000 ₽
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="sensors__list_item">
-                                            <div class="img">
-                                                <picture>
-                                                    <source srcset="" type="image/webp">
-                                                    <img src="<?php echo get_template_directory_uri() ?>/assets/img/prod/sensor.png" alt="">
-                                                </picture>
-                                            </div>
-                                            <div class="body">
-                                                <a href="#" class="body__name">
-                                                    Конвексный датчик Mindray C7-3E
-                                                </a>
-                                                <div class="body__info">
-                                                    2,2-8,1 МГц | высокоплотный
-                                                </div>
-                                                <div class="body__info">
-                                                    Абдоминальные исследования, акушерство и гинекология.
-                                                </div>
-                                                <div class="body__info">
-                                                    от 1 200 000 ₽
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
                                     <!-- <a href="#" class="sensors__action">
                                         Показать все датчики
                                     </a> -->
@@ -537,9 +491,6 @@ get_header();
                         </div>
 
                         <div class="prod__comment_body">
-                            <div class="prod__comment_body_h">
-                                Написать с помощью +
-                            </div>
                             <form class="prod__review-form">
                                 <div class="prod__comment_body_inp">
                                     <input type="text" placeholder="Имя" name="name" required>

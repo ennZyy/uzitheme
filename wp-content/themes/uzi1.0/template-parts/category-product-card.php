@@ -1,6 +1,11 @@
 <?php
 $product = wc_get_product();
 $attributes = $product->get_attributes();
+$product_category = $product->get_category_ids();
+
+//echo '<pre>';
+//print_r($product_category);
+//echo '</pre>';
 
 $rating = get_field('rating', get_the_ID());
 ?>
@@ -16,41 +21,51 @@ $rating = get_field('rating', get_the_ID());
     </div>
     <div class="card__body">
         <div class="card__body_main">
-            <div class="name"><?= the_title(); ?></div>
+            <div class="name" <?php if (strlen($product->get_title()) > 30): ?> style="line-height: 29px;" <?php endif; ?>><?= the_title(); ?></div>
             <div class="values">
-                <?php if ($product->is_type( 'variable' )): ?>
+                <?php if ($product->is_type('variable')): ?>
                     <div class="values__price">
-                        от <?php $price = $product->get_variation_price('min'); echo ($price > 30) ? explode('.', $price)[0] : '30' ?>
+                        от <?php $price = $product->get_variation_price('min');
+                        echo ($price > 30) ? explode('.', $price)[0] : '30' ?>
                     </div>
                 <?php else: ?>
                     <div class="values__price">
-                        от <?php echo $product->get_regular_price() . get_woocommerce_currency_symbol( $currency = '' ); ?>
+                        от <?php echo $product->get_regular_price() . get_woocommerce_currency_symbol($currency = ''); ?>
                     </div>
                 <?php endif; ?>
-                <div class="values__cnt">
-                    <?php if ( !empty($rating) ): ?><span><?= $rating ?>/10</span><?php else: ?><span>0/10</span><?php endif; ?>
-                </div>
+                <?php if (!in_array(48, $product_category)): ?>
+                    <div class="values__cnt">
+                        <?php if (!empty($rating)): ?><span><?= $rating ?>/10</span><?php else: ?>
+                            <span>0/10</span><?php endif; ?>
+                    </div>
+                <?php endif; ?>
             </div>
             <div class="link">
                 <div>Подробнее</div>
             </div>
         </div>
         <div class="card__body_ex">
-            <div class="head">
-                В категориях
-            </div>
+            <?php if (!in_array(48, $product_category)): ?>
+                <div class="head">
+                    В категориях
+                </div>
+            <?php else: ?>
+                <div class="head">
+                    Подходит:
+                </div>
+            <?php endif; ?>
             <ul class="list">
                 <?php
-                foreach ( $attributes as $attribute_item ):
-                    foreach (wc_get_product_terms( $product->get_id(), $attribute_item->get_data()['name'], array( 'taxonomy' =>  'sensor-frequencies' ) ) as $value): ?>
+                foreach ($attributes as $attribute_item):
+                    foreach (wc_get_product_terms($product->get_id(), $attribute_item->get_data()['name'], array('taxonomy' => 'sensor-frequencies')) as $value): ?>
                         <?php
-                            if ( $value->taxonomy === 'pa_application-area' ):
-                                echo '<li class="list__item">— ' . $value->name . '</li>';
-                            endif;
+                        if ($value->taxonomy === 'pa_application-area'):
+                            echo '<li class="list__item">— ' . $value->name . '</li>';
+                        endif;
 
-                            if ( $value->taxonomy === 'pa_suitable-device' && is_product_category(48) ) {
-                                echo '<li class="list__item">— ' . $value->name . '</li>';
-                            }
+                        if ($value->taxonomy === 'pa_suitable-device' && is_product_category(48)) {
+                            echo '<li class="list__item">— ' . $value->name . '</li>';
+                        }
 
                         ?>
                     <?php endforeach;

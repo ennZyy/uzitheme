@@ -162,6 +162,7 @@ get_header();
                             <div class="vendor__body_list_item">
                                 <h3 class="head">Датчики</h3>
                             <?php
+                            if ( $vendor_sensors ) :
                             $block_class = '';
                             for ($i=0; $i < 2; $i++) :
                                 $block_class = match ($i) {
@@ -237,7 +238,8 @@ get_header();
                                     </a>
                                     <?php endforeach; ?>
                                 </div>
-                            <?php endfor; ?>
+                            <?php endfor;
+                            endif;?>
                                 <div class="more">
                                     <button class="more__btn sensor__more">Показать еще</button>
                                 </div>

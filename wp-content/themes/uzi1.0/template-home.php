@@ -106,46 +106,19 @@ $about_us_settings = get_field('aboutus_settings');
 
         <section class="rates">
             <div class="container">
-                <div class="rates__in">
-                    <div class="rates__content">
-                        <h2 class="rates__content_title section__title">
-                            <?= $rating_settings['title'] ?>
-                        </h2>
-                        <ul class="rates__content_list">
-                            <?php foreach ($rating_settings['articles'] as $article): ?>
-                                <li class="rates__content_item">
-                                    <a href="<?= $article['url'] ?>"><?= $article['title'] ?></a>
-                                </li>
-                            <?php endforeach; ?>
-                        </ul>
-                        <div class="rates__content_action">
-                            <a href="<?php if ( empty($rating_settings['button_url']) ) { echo get_page_link(15);} else {echo $rating_settings['button_url'];}  ?>">
-                                Перейти ко всем рейтингам
-                            </a>
-                        </div>
+                <a href="<?= $rating_settings['url'] ?>" class="rates__in">
+                    <picture>
+                        <img
+                            src="<?= $rating_settings['img_url'] ?>"
+                            class="rates__bg-image"
+                        />
+                    </picture>
+                    <?php if ( $rating_settings['text'] ): ?>
+                    <div class="rates__container">
+                        <?= $rating_settings['text'] ?>
                     </div>
-                    <div class="rates__img">
-                        <div class="rates__img_body">
-                            <div class="descr">
-                                <?= $rating_settings['messager']['title'] ?>
-                            </div>
-                            <div class="ms">
-                                <div class="ms__item l">
-                                    <div class="ms__item_av" style="background-image: url('<?= $rating_settings['messager']['first_image']['url'] ?>');"></div>
-                                    <div class="ms__item_value">
-                                        <?= $rating_settings['messager']['first_comment'] ?>
-                                    </div>
-                                </div>
-                                <div class="ms__item r">
-                                    <div class="ms__item_av" style="background-image: url('<?= $rating_settings['messager']['second_image']['url'] ?>');"></div>
-                                    <div class="ms__item_value">
-                                        <?= $rating_settings['messager']['second_comment'] ?>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                    <?php endif; ?>
+                </a>
             </div>
         </section>
 
@@ -299,9 +272,10 @@ $about_us_settings = get_field('aboutus_settings');
                         </h2>
                         <div class="feed__body_descr">
                             получите бесплатную
+                            <br>
                             консультацию от наших специалистов
                         </div>
-                        <input type="tel" id="telInput" name="userPhone" class="feed__body_input" placeholder="+7 (ХХХ) ХХХ ХХ ХХ">
+                        <input type="tel" id="telInput" name="userPhone" class="feed__body_input" placeholder="+7 (495) 555-55-55">
                         <button class="feed__body_btn">
                             Получить консультацию
                         </button>
@@ -351,7 +325,7 @@ $about_us_settings = get_field('aboutus_settings');
                         ));
                         if ($featured->have_posts()) :
                             ?>
-                            <div class="best__ap-list best__list">
+                            <div class="best__ap-list best__all-list best__list">
                                 <?php while ($featured->have_posts()):
                                     $featured->the_post();
                                     get_template_part('template-parts/second-product', 'card');
