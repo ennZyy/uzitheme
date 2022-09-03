@@ -7,7 +7,7 @@
  * @package BPSD
  */
 
-$vendors_query = $wpb_all_query = new WP_Query(
+$vendors_query =  new WP_Query(
     array(
         'post_type'=>'vendors',
         'post_status'=>'publish',
@@ -17,7 +17,7 @@ $vendors_query = $wpb_all_query = new WP_Query(
 $vendors = $vendors_query->posts;
 
 //echo '<pre>';
-//print_r($vendors);
+//print_r($vendors_query);
 //echo '</pre>';
 
 get_header();
@@ -44,7 +44,7 @@ get_header();
                     </h1>
                     <div class="vendors__list">
                         <?php foreach ( $vendors as $vendor ): ?>
-                            <div class="vendors__item">
+                            <a href="<?= get_post_permalink($vendor->ID) ?>" class="vendors__item">
                                 <div class="vendors__item_img">
                                     <picture>
                                         <source srcset="" type="image/webp">
@@ -53,11 +53,19 @@ get_header();
                                 </div>
                                 <div class="vendors__item_body">
                                     <div class="vendors__item_body_name"><?= $vendor->post_title ?></div>
-                                    <a href="<?= get_post_permalink($vendor->ID) ?>" class="vendors__item_body_link">подробнее</a>
+                                    <p class="vendors__item_body_link">подробнее</p>
                                 </div>
-                            </div>
+                            </a>
                         <?php endforeach; ?>
                     </div>
+                    <?php if ($vendors_query->max_num_pages > 1) : ?>
+                        <script>
+                            var posts_vars = '<?php echo serialize($vendors_query->query_vars); ?>';
+                            var current_page = <?php echo (get_query_var('paged')) ? get_query_var('paged') : 1; ?>;
+                            var max_pages = '<?php echo $vendors_query->max_num_pages; ?>';
+                        </script>
+                        <button id="vendor-loadmore">Показать ещё</button>
+                    <?php endif; ?>
                 </div>
             </div>
         </section>

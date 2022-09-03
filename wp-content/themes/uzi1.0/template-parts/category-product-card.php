@@ -71,7 +71,7 @@ $rating = get_field('rating', get_the_ID());
                     <?php endforeach;
                 endforeach; ?>
             </ul>
-            <div class="action">
+            <div class="action product-action-consultation">
                 <button>
                     Консультация в один клик
                 </button>

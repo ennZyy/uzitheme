@@ -298,10 +298,6 @@ function post_add_reply()
 
 function filter_apparatus()
 {
-//    echo '<pre>';
-//    print_r($_GET);
-//    echo '</pre>';
-
     $min = '';
     $max = '';
     $vendor = '';
@@ -316,13 +312,13 @@ function filter_apparatus()
             'terms' => $_GET['category_id'],
         ]
     ];
-    if (isset($_GET['min']) && !empty($_GET['min'])) {
+    if (isset($_GET['min'])) {
         $min = $_GET['min'];
     } else {
         $min = 0;
     }
 
-    if (isset($_GET['max']) && !empty($_GET['max'])) {
+    if (isset($_GET['max'])) {
         $max = $_GET['max'];
     } else {
         $max = 99999999;
@@ -368,7 +364,7 @@ function filter_apparatus()
 
     $products = new WP_Query(array(
         'post_type' => 'product',
-        'posts_per_page' => '9',
+        'posts_per_page' => '-1',
         'meta_key' => '_price',
         'order' => 'asc',
         'paged' => get_query_var('page'),
@@ -388,6 +384,7 @@ function filter_apparatus()
         $attributes = $wc_product->get_attributes();
 
         $rating = get_field('rating', get_the_ID());
+        if ( empty($vendor) ):
         ?>
         <a href="<?= $wc_product->get_permalink() ?>" class="list__body_items_item card">
             <div class="card__img">
@@ -445,9 +442,72 @@ function filter_apparatus()
 
         </a>
     <?php
+    else:
+        $product_meta = get_post_meta($product->ID);
+
+        if ( isset($product_meta['product_vendor']) && !empty($product_meta['product_vendor']) && $product_meta['product_vendor'][0] == $vendor ) :?>
+            <a href="<?= $wc_product->get_permalink() ?>" class="list__body_items_item card">
+                <div class="card__img">
+                    <picture>
+                        <source srcset="" type="image/webp">
+                        <img
+                                src="<?= wp_get_attachment_url($wc_product->get_image_id()); ?>"
+                                alt="<?= $wc_product->get_title() ?>"
+                        >
+                    </picture>
+                </div>
+                <div class="card__body">
+                    <div class="card__body_main">
+                        <div class="name"><?= $wc_product->get_title() ?></div>
+                        <div class="values">
+                            <div class="values__price">
+                                от <?php echo $wc_product->get_regular_price() . get_woocommerce_currency_symbol($currency = ''); ?>
+                            </div>
+                            <div class="values__cnt">
+                                <?php if (!empty($rating) && is_product_category(47)): ?><span><?= $rating ?>/10</span><?php else: ?><span>0/10</span><?php endif; ?>
+                            </div>
+                        </div>
+                        <div class="link">
+                            <div>Подробнее</div>
+                        </div>
+                    </div>
+                    <div class="card__body_ex">
+                        <div class="head">
+                            В категориях
+                        </div>
+                        <ul class="list">
+                            <?php
+                            foreach ($attributes as $attribute_item):
+                                foreach (wc_get_product_terms($wc_product->get_id(), $attribute_item->get_data()['name'], array('taxonomy' => 'sensor-frequencies')) as $value): ?>
+                                    <?php
+                                    if ($value->taxonomy === 'pa_application-area'):
+                                        echo '<li class="list__item">— ' . $value->name . '</li>';
+                                    endif;
+
+                                    if ($value->taxonomy === 'pa_suitable-device' && is_product_category(48)) {
+                                        echo '<li class="list__item">— ' . $value->name . '</li>';
+                                    }
+
+                                    ?>
+                                <?php endforeach;
+                            endforeach; ?>
+                        </ul>
+                        <div class="action">
+                            <button>
+                                Консультация в один клик
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+            </a>
+        <?php
+        endif;
+    ?>
+
+    <?php
+        endif;
     endforeach;
-    $count = count($products->posts);
-    echo "<input type='hidden' name='countProduct' value='$count'>";
     wp_die();
 }
 

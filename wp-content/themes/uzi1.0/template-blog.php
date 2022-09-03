@@ -34,7 +34,7 @@ get_header();
                     <div class="articles__filter">
                         <label for="filterView">
                             <button class="articles__filter_item articles__filter-views" name="filterView">Фильтровать по просмотрам</button>
-                            <input type="hidden" name="inputFilterView" value="popular">
+                            <input type="hidden" name="inputFilterView" value="nopopular">
                         </label>
                         <label for="filterDate">
                             <button class="articles__filter_item articles__filter-date active" name="filterDate" >Фильтровать по дате</button>
@@ -48,7 +48,7 @@ get_header();
                             <div class="art__img">
                                 <picture>
                                     <source srcset="" type="image/webp">
-                                    <img src="<?= get_the_post_thumbnail($post->ID) ?>" alt="<?php the_title(); ?>">
+                                    <?= get_the_post_thumbnail($post->ID, 'post-thumbnail', ['alt'=>$post->post_title]) ?>
                                 </picture>
                             </div>
                             <div class="art__body">

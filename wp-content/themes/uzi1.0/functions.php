@@ -703,7 +703,7 @@ add_action( 'init', function() {
 
 } );
 
-function get_vendor_product($vendor_id) {
+function get_vendor_product($category_name, $vendor_id) {
     $vendor_products = [];
     $all_products = new WP_Query([
         'post_type'              => array( 'product' ),
@@ -714,6 +714,7 @@ function get_vendor_product($vendor_id) {
     foreach ( $all_products->posts as $product ) {
         $product_meta = get_post_meta($product->ID);
 
+//        $product_cat = wc_get_product_term_ids($product->ID, 'product_cat');
         if ( isset($product_meta['product_vendor']) && !empty($product_meta['product_vendor']) && $product_meta['product_vendor'][0] == $vendor_id ) {
             $vendor_products[] = $product;
             $product->rating = $product_meta['rating'][0];
@@ -794,17 +795,22 @@ function get_user_contact_page() {
 
     <h1>Заявки пользователей</h1>
 
-    <?php if ( !empty($phones) ): ?>
+    <?php if ( !empty($phones) ):
+
+//        echo '<pre>';
+//        print_r($phones);
+//        echo '</pre>';
+    ?>
     <table id="customers">
         <tr>
             <th>ID</th>
             <th>Phone</th>
         </tr>
-        <?php foreach ( $phones as $phone ):
+        <?php foreach ( $phones as $key => $phone ):
             $phone_number = str_replace(array('+', ' ', '(' , ')', '-'), '', $phone['phones']);;
         ?>
         <tr>
-            <th><?= $phone['id'] ?></th>
+            <th><?= $key ?></th>
             <th>
                 <a href="tel:+<?= $phone_number ?>"><?= $phone['phones'] ?></a>
             </th>
@@ -840,6 +846,7 @@ function loadmore_get_posts(){
 
     $posts = query_posts($args);
 
+    if ( $args['post_type'] != 'vendors' ):
     foreach ($posts as $post) :
         $product = new WC_Product($post->ID);
         $attributes = $product->get_attributes();
@@ -894,7 +901,7 @@ function loadmore_get_posts(){
                         endforeach; ?>
                     </ul>
                     <?php endif; ?>
-                    <div class="action">
+                    <div class="action product-action-consultation">
                         <button>
                             Консультация в один клик
                         </button>
@@ -906,7 +913,23 @@ function loadmore_get_posts(){
 
     <?php
     endforeach;
-
+    else:
+        foreach ( $posts as $vendor ):?>
+            <a href="<?= get_permalink($vendor->ID) ?>" class="vendors__item">
+                <div class="vendors__item_img">
+                    <picture>
+                        <source srcset="" type="image/webp">
+                        <?= get_the_post_thumbnail($vendor->ID, '', ['alt' => $vendor->post_title]) ?>
+                    </picture>
+                </div>
+                <div class="vendors__item_body">
+                    <div class="vendors__item_body_name"><?= $vendor->post_title ?></div>
+                    <p class="vendors__item_body_link">подробнее</p>
+                </div>
+            </a>
+        <?
+        endforeach;
+    endif;
     wp_die();
 }
 add_action('wp_ajax_loadmore', 'loadmore_get_posts');
@@ -973,7 +996,7 @@ function loadmore_featured(){
                             endforeach; ?>
                         </ul>
                     <?php endif; ?>
-                    <div class="action">
+                    <div class="action product-action-consultation">
                         <button>
                             Консультация в один клик
                         </button>
@@ -1169,9 +1192,10 @@ function _count_comment_replies(&$replies,$comment_id) {
 
 add_filter( 'woocommerce_subcategory_count_html', 'true_category_price_range', 25, 2 );
 
-function true_category_price_range( $product_category ) {
+function true_category_price_range($product_category)
+{
     $result = '';
-    $product_ids = get_posts( array(
+    $product_ids = get_posts(array(
         'post_type' => 'product',
         'posts_per_page' => -1,
         'post_status' => 'publish',
@@ -1190,48 +1214,29 @@ function true_category_price_range( $product_category ) {
                 'operator' => 'NOT IN',
             ),
         )
-    ) );
-
-    // если товаров в категории нет, то возвращаем ничего
-    if( ! $product_ids ) {
+    ));
+    if (!$product_ids) {
         return;
     }
 
-    // окей, товары значит есть, пройдёмся по ним циклом и вычислим минимальное и максимальное значение
-    $min = PHP_FLOAT_MAX;
-    $max = 0;
-
-    foreach ( $product_ids as $product_id ) {
-        // получим объект товара из его ID
-        $product = wc_get_product( $product_id );
-        // если товар простой
-        if ( $product->is_type( 'simple' ) ) {
-            // получаем цену
+    $prices = [];
+    foreach ($product_ids as $product_id) {
+        $product = wc_get_product($product_id);
+        if ($product->is_type('simple')) {
             $product_price = $product->get_price();
-            // вычисляем минимальное
-            $min = $product_price < $min ? $product_price : $min;
-            // вычисляем максимальное
-            $max = $product_price > $max ? $product_price : $max;
-
-            // если товар вариативный, то тут можно слегка заморочиться
-        } elseif ( $product->is_type( 'variable' ) ) {
-            // получаем массив цен вариаций этого товара, уже отсортированных!
+            $prices[] = $product_price;
+        } elseif ($product->is_type('variable')) {
             $prices = $product->get_variation_prices();
-            // вычисляем минимальное
-            $min = current( $prices[ 'price' ] ) < $min ? current( $prices[ 'price' ] ) : $min;
-            // вычисляем максимальное
-            $max = end( $prices[ 'price' ] ) > $max ? end( $prices[ 'price' ] ) : $max;
+            $min = current($prices['price']) < $min ? current($prices['price']) : $min;
+            $max = end($prices['price']) > $max ? end($prices['price']) : $max;
         }
     }
 
-    // финальная проверка, если существуют мин и макс, то выводим
-    if( $min && $max ) {
-        $result = [
-            'min'   => $min,
-            'max'   => $max
-        ];
-        return $result;
-    }
+    $result = [
+        'min' => min($prices),
+        'max' => max($prices)
+    ];
+    return $result;
 }
 
 add_shortcode( 'heading', 'heading_shortcode_handler' );
@@ -1243,7 +1248,6 @@ function heading_shortcode_handler( $atts ){
     $out = '
 	<div class="prod__descr_item_head">
         <h3 class="prod__descr_item_head_title">'.$rg->text.'</h3>
-        <button class="prod__descr_item_head_btn">Скрыть</button>
     </div>
 	';
 
@@ -1253,7 +1257,6 @@ function heading_shortcode_handler( $atts ){
 add_shortcode( 'textwithimage', 'textwithimage_shortcode_handler' );
 function textwithimage_shortcode_handler( $atts ){
     $rg = (object) shortcode_atts( [
-        'text' => '',
         'imgurl'=>'',
         'imgtext'=>''
     ], $atts );
@@ -1312,9 +1315,6 @@ function product_rating_shortcode_handler( $atts ){
                             <div class="prod__descr_item_head">
                                 <div class="prod__descr_item_head_title">
                                     '.$rg->place.'
-                                </div>
-                                <div class="prod__descr_item_head_btn">
-                                    Скрыть
                                 </div>
                             </div>
                             <div class="prod__descr_item_body">
@@ -1389,4 +1389,110 @@ function product_text_shortcode_handler( $atts ){
 	';
 
     return $out;
+}
+
+// Хуки 1
+function true_add_mce_button() {
+    // проверяем права пользователя - может ли он редактировать посты и страницы
+    if ( !current_user_can( 'edit_posts' ) && !current_user_can( 'edit_pages' ) ) {
+        return; // если не может, то и кнопка ему не понадобится, в этом случае выходим из функции
+    }
+    // проверяем, включен ли визуальный редактор у пользователя в настройках (если нет, то и кнопку подключать незачем)
+    if ( 'true' == get_user_option( 'rich_editing' ) ) {
+        add_filter( 'mce_external_plugins', 'true_add_tinymce_script' );
+        add_filter( 'mce_buttons', 'true_register_mce_button' );
+    }
+}
+add_action('admin_head', 'true_add_mce_button');
+
+// В этом функции указываем ссылку на JavaScript-файл кнопки
+function true_add_tinymce_script( $plugin_array ) {
+    $plugin_array['true_mce_button'] = get_stylesheet_directory_uri() .'/true_button.js'; // true_mce_button - идентификатор кнопки
+    return $plugin_array;
+}
+
+// Регистрируем кнопку в редакторе
+function true_register_mce_button( $buttons ) {
+    array_push( $buttons, 'true_mce_button2' ); // true_mce_button - идентификатор кнопки
+    return $buttons;
+}
+
+// Хуки 2
+function true_add_mce_button2() {
+    // проверяем права пользователя - может ли он редактировать посты и страницы
+    if ( !current_user_can( 'edit_posts' ) && !current_user_can( 'edit_pages' ) ) {
+        return; // если не может, то и кнопка ему не понадобится, в этом случае выходим из функции
+    }
+    // проверяем, включен ли визуальный редактор у пользователя в настройках (если нет, то и кнопку подключать незачем)
+    if ( 'true' == get_user_option( 'rich_editing' ) ) {
+        add_filter( 'mce_external_plugins', 'true_add_tinymce_script2' );
+        add_filter( 'mce_buttons', 'true_register_mce_button2' );
+    }
+}
+add_action('admin_head', 'true_add_mce_button2');
+
+// В этом функции указываем ссылку на JavaScript-файл кнопки
+function true_add_tinymce_script2( $plugin_array ) {
+    $plugin_array['true_mce_button2'] = get_stylesheet_directory_uri() .'/true_button.js'; // true_mce_button - идентификатор кнопки
+    return $plugin_array;
+}
+
+// Регистрируем кнопку в редакторе
+function true_register_mce_button2( $buttons ) {
+    array_push( $buttons, 'true_mce_button' ); // true_mce_button - идентификатор кнопки
+    return $buttons;
+}
+
+
+// Хуки 3
+function true_add_mce_button3() {
+    // проверяем права пользователя - может ли он редактировать посты и страницы
+    if ( !current_user_can( 'edit_posts' ) && !current_user_can( 'edit_pages' ) ) {
+        return; // если не может, то и кнопка ему не понадобится, в этом случае выходим из функции
+    }
+    // проверяем, включен ли визуальный редактор у пользователя в настройках (если нет, то и кнопку подключать незачем)
+    if ( 'true' == get_user_option( 'rich_editing' ) ) {
+        add_filter( 'mce_external_plugins', 'true_add_tinymce_script3' );
+        add_filter( 'mce_buttons', 'true_register_mce_button3' );
+    }
+}
+add_action('admin_head', 'true_add_mce_button3');
+
+// В этом функции указываем ссылку на JavaScript-файл кнопки
+function true_add_tinymce_script3( $plugin_array ) {
+    $plugin_array['true_mce_button3'] = get_stylesheet_directory_uri() .'/true_button.js'; // true_mce_button - идентификатор кнопки
+    return $plugin_array;
+}
+
+// Регистрируем кнопку в редакторе
+function true_register_mce_button3( $buttons ) {
+    array_push( $buttons, 'true_mce_button3' ); // true_mce_button - идентификатор кнопки
+    return $buttons;
+}
+
+
+// Хуки 4
+function true_add_mce_button4() {
+    // проверяем права пользователя - может ли он редактировать посты и страницы
+    if ( !current_user_can( 'edit_posts' ) && !current_user_can( 'edit_pages' ) ) {
+        return; // если не может, то и кнопка ему не понадобится, в этом случае выходим из функции
+    }
+    // проверяем, включен ли визуальный редактор у пользователя в настройках (если нет, то и кнопку подключать незачем)
+    if ( 'true' == get_user_option( 'rich_editing' ) ) {
+        add_filter( 'mce_external_plugins', 'true_add_tinymce_script4' );
+        add_filter( 'mce_buttons', 'true_register_mce_button4' );
+    }
+}
+add_action('admin_head', 'true_add_mce_button4');
+
+// В этом функции указываем ссылку на JavaScript-файл кнопки
+function true_add_tinymce_script4( $plugin_array ) {
+    $plugin_array['true_mce_button4'] = get_stylesheet_directory_uri() .'/true_button.js'; // true_mce_button - идентификатор кнопки
+    return $plugin_array;
+}
+
+// Регистрируем кнопку в редакторе
+function true_register_mce_button4( $buttons ) {
+    array_push( $buttons, 'true_mce_button4' ); // true_mce_button - идентификатор кнопки
+    return $buttons;
 }

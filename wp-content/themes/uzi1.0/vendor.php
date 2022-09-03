@@ -5,7 +5,7 @@ Template Post Type: vendors
 */
 
 global $post;
-
+$vendor_desc = get_the_content();
 $vendor_information = get_field('information_about_vendor');
 $vendor_sensors = get_field('vendor_sensor');
 
@@ -63,6 +63,7 @@ get_header();
                             </div>
                         </div>
                         <div class="vendor__body_list">
+                            <?php if ( $vendor_information['kind-of-activity'] ): ?>
                             <div class="vendor__body_list_item">
                                 <h3 class="head">Вид деятельности:</h3>
                                 <div class="text">
@@ -70,13 +71,18 @@ get_header();
 
                                 </div>
                             </div>
+                            <?php endif; ?>
+
+                            <?php if ( $vendor_desc ): ?>
                             <div class="vendor__body_list_item">
                                 <h3 class="head">Информация о компании:</h3>
                                 <div class="text">
-                                    <?= the_content() ?>
+                                    <?= $vendor_desc ?>
                                 </div>
                             </div>
+                            <?php endif; ?>
 
+                            <?php if ( $vendor_products ): ?>
                             <div class="vendor__body_list_item">
                                 <h3 class="head">Товары от этой компании</h3>
                                 <?php
@@ -142,7 +148,7 @@ get_header();
                                                             <?php endforeach;
                                                         endforeach; ?>
                                                     </ul>
-                                                    <div class="action">
+                                                    <div class="action product-action-consultation">
                                                         <button>
                                                             Консультация в один клик
                                                         </button>
@@ -158,16 +164,18 @@ get_header();
                                     <button class="more__btn vendor__product-more">Показать еще</button>
                                 </div>
                             </div>
-
+                            <?php
+                            endif;
+                            if ( $vendor_sensors ) : ?>
                             <div class="vendor__body_list_item">
                                 <h3 class="head">Датчики</h3>
-                            <?php
-                            if ( $vendor_sensors ) :
-                            $block_class = '';
-                            for ($i=0; $i < 2; $i++) :
-                                $block_class = match ($i) {
-                                    0 => '',
-                                    1 => 'sensor__list-hidden',
+                                <?php
+
+                                $block_class = '';
+                                for ($i=0; $i < 2; $i++) :
+                                    $block_class = match ($i) {
+                                        0 => '',
+                                        1 => 'sensor__list-hidden',
                                 };
                                 ?>
                                 <div class="list sensor__list <?= $block_class ?>">
@@ -228,7 +236,7 @@ get_header();
                                                     endforeach; ?>
                                                 </ul>
                                                 <?php endif; ?>
-                                                <div class="action">
+                                                <div class="action product-action-consultation">
                                                     <button>
                                                         Консультация в один клик
                                                     </button>
@@ -238,12 +246,12 @@ get_header();
                                     </a>
                                     <?php endforeach; ?>
                                 </div>
-                            <?php endfor;
-                            endif;?>
+                            <?php endfor; ?>
                                 <div class="more">
                                     <button class="more__btn sensor__more">Показать еще</button>
                                 </div>
                             </div>
+                        <?php endif; ?>
                         </div>
                     </div>
                 </div>

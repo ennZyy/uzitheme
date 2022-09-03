@@ -4,6 +4,7 @@ $query = get_search_query();
 $sentence = $_GET['sentence'];
 $search_types = explode(',', $_GET['post_type']);
 $result_str = ' Поиск по фразе ' . '<span>“' . get_search_query() . '”</span>';
+$posts = [];
 foreach ( $search_types as $type ) {
     $posts = new WP_Query(
         [
@@ -13,10 +14,10 @@ foreach ( $search_types as $type ) {
             'sentence'  => $sentence
         ]
     );
+}
 
-    if ( empty($nothing_str) ) {
-        $result_str = ' Поиск по фразе ' . '<span>“' . get_search_query() . '” ничего не найдено</span>';
-    }
+if ( empty($posts->posts) ) {
+    $result_str = ' Поиск по фразе ' . '<span>“' . get_search_query() . '” ничего не найдено</span>';
 }
 
 get_header();
@@ -38,10 +39,10 @@ get_header();
                     );?>
                 </div>
                 <div class="search__in">
+                    <div class="search__head">
+                        <?= $result_str ?>
+                    </div>
                     <div class="search__list">
-                        <div class="search__head">
-                            <?= $result_str ?>
-                        </div>
 
                         <?php foreach ( $search_types as $type ):
                             $posts = new WP_Query(
@@ -110,7 +111,7 @@ get_header();
                                                         <?php endforeach;
                                                     endforeach; ?>
                                                 </ul>
-                                                <div class="action">
+                                                <div class="action product-action-consultation">
                                                     <button>
                                                         Консультация в один клик
                                                     </button>

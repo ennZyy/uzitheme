@@ -190,7 +190,7 @@ get_header();
                                 </div>
                             </div>
                             <div class="prod__main_descr_action">
-                                <button class="prod__main_descr_action_btn">Консультация перед покупкой</button>
+                                <button class="prod__main_descr_action_btn product-action-consultation">Консультация перед покупкой</button>
                             </div>
                         </div>
                     </div>
@@ -322,7 +322,7 @@ get_header();
                                                 $image = wp_get_attachment_image_url($sensor_product->get_image_id());
                                                 $attributes = $sensor_product->get_attributes();
                                         ?>
-                                            <div class="sensors__list_item">
+                                            <a href="<?= $item->guid ?>" class="sensors__list_item">
                                             <div class="img">
                                                 <picture>
                                                     <source srcset="" type="image/webp">
@@ -330,9 +330,9 @@ get_header();
                                                 </picture>
                                             </div>
                                             <div class="body">
-                                                <a href="<?= $item->guid ?>" class="body__name">
+                                                <h2 class="body__name">
                                                     <?= $item->post_title ?>
-                                                </a>
+                                                </h2>
                                                 <?php if ( !empty($attributes) ): ?>
                                                     <div class="body__info">
                                                         <?php
@@ -354,7 +354,7 @@ get_header();
                                                     от <?= $sensor_product->get_price() ?> <?= get_woocommerce_currency_symbol() ?>
                                                 </div>
                                             </div>
-                                        </div>
+                                        </a>
                                         <?php
                                             endforeach;
                                         ?>
@@ -459,7 +459,7 @@ get_header();
                                                 <?php endforeach;
                                             endforeach; ?>
                                         </ul>
-                                        <div class="action">
+                                        <div class="action product-action-consultation">
                                             <button>
                                                 Консультация в один клик
                                             </button>
@@ -645,7 +645,7 @@ get_header();
                                     </button>
                                 </div>
                                 <div class="sensor__main_body_content_part">
-                                    <button class="button">
+                                    <button class="button product-action-consultation">
                                         Консультация перед покупкой
                                     </button>
                                 </div>

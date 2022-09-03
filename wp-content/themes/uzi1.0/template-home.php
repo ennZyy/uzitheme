@@ -59,6 +59,15 @@ $about_us_settings = get_field('aboutus_settings');
                     <div class="hero__body">
                         <div class="hero__body_wr">
                             <?php
+                            // Add product count
+                            $application_area = get_terms( 'pa_application-area', [
+                                'hide_empty' => false,
+                            ] );
+
+//                            echo '<pre>';
+//                            print_r($application_area);
+//                            echo '</pre>';
+
                             $block_class = '';
                             for ($i=0; $i < 3; $i++) :
                                 $block_class = match ($i) {
@@ -72,21 +81,21 @@ $about_us_settings = get_field('aboutus_settings');
                                     <?php
                                     $categories = '';
                                     if ($i == 0){
-                                        $categories = array_slice($category_settings['categories'], 0, 3);
+                                        $categories = array_slice($application_area, 0, 3);
                                     } elseif ($i == 1) {
-                                        $categories = array_slice($category_settings['categories'], 2, 3);
+                                        $categories = array_slice($application_area, 2, 3);
                                     } elseif ($i == 2) {
-                                        $categories = array_slice($category_settings['categories'], 5, 3);
+                                        $categories = array_slice($application_area, 5, 3);
                                     }
 
                                     foreach ($categories as $category_id):
-                                        $thumbnail_id = get_woocommerce_term_meta($category_id, 'thumbnail_id', true);
+                                        $category = get_term_by( 'slug', $category_id->slug, 'product_cat' );
+
+                                        $thumbnail_id = get_woocommerce_term_meta($category->term_id, 'thumbnail_id', true);
                                         $image = wp_get_attachment_url($thumbnail_id);
-                                        $name = get_the_category_by_ID($category_id);
-                                        $product_count = get_term( $category_id, 'product_cat' );
                                         ?>
-                                        <a href="/product-category/ultrasound-machines/" class="item w-l" style="background-image: url('<?= $image ?>');">
-                                            <div class="item__value"><?= $name ?> <span>(<?= $product_count->count ?>)</span></div>
+                                        <a href="/product-category/ultrasound-machines/?attribute=<?= $category_id->term_id ?>" class="item w-l" style="background-image: url('<?= $image ?>');">
+                                            <div class="item__value"><?= $category_id->name ?> <span>(<?= $category_id->count ?>)</span></div>
                                         </a>
                                     <?php endforeach; ?>
                                 </div>

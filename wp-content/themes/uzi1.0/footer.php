@@ -181,6 +181,51 @@ $phone = str_replace(array('+', ' ', '(', ')', '-'), '', $footer_settings['conta
     </div>
 </div>
 
+<!-- Модальное окно "Консультация в один клик" -->
+<div class="feed feed-modal modal-hide">
+    <div class="feed-overlay">
+        <div class="container">
+            <div class="feed__in">
+                <i class="fa fa-times close" aria-hidden="true"></i>
+                <form class="feed__body-modal">
+                    <h2 class="feed__body_title section__title">
+                        <span>как правильно </span>
+                        Выбрать аппарат
+                    </h2>
+                    <div class="feed__body_descr">
+                        получите бесплатную
+                        <br>
+                        консультацию от наших специалистов
+                    </div>
+                    <input type="tel" id="modalTelInput" name="userPhone" class="feed__body_input" placeholder="+7 (495) 555-55-55">
+                    <button class="feed__body_btn">
+                        Получить консультацию
+                    </button>
+                    <div class="feed__body_link">
+                        при нажатии на кнопку вы соглашаетесь с <a href="
+                            <?php
+                        if(isset($policy_url['url'])){
+                            echo $policy_url['url'];
+                        }else{
+                            echo get_page_link(3);
+                        } ?>">политикой конфиденциальности</a>
+                    </div>
+                </form>
+                <div class="feed__img">
+                    <picture>
+                        <source srcset="" type="image/webp">
+                        <source srcset="<?php echo get_template_directory_uri() ?>/assets/img/feed/feed-mob-mini-img.png" media="(max-width:650px)" type="image/webp">
+                        <source srcset="<?php echo get_template_directory_uri() ?>/assets/img/feed/feed-mob-img.png" media="(max-width:900px)" type="image/webp">
+
+                        <img src="<?php echo get_template_directory_uri() ?>/assets/img/feed/feed-img.png" alt="">
+                    </picture>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Конец Модальное окно "Консультация в один клик" -->
+<script src="https://cdn.jsdelivr.net/npm/jquery.maskedinput@1.4.1/src/jquery.maskedinput.min.js" type="text/javascript"></script>
 <?php wp_footer(); ?>
 
 </body>

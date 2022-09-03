@@ -1,5 +1,6 @@
 <?php
 $current_category = get_queried_object();
+$category_product_count = '';
 $products = new WP_Query(array(
     'post_type' => 'product',
     'posts_per_page' => '9',
@@ -17,11 +18,33 @@ $products = new WP_Query(array(
     )
 ));
 
-$price_range = true_category_price_range($current_category->slug);
+$category_product_count = '';
 
-//echo '<pre>';
-//print_r($current_category);
-//echo '</pre>';
+if ( $_GET['attribute'] ) {
+    $filtered_products = new WP_Query(array(
+        'post_type' => 'product',
+        'posts_per_page' => '9',
+        'order' => 'asc',
+        'paged'=> get_query_var('page'),
+        'tax_query' => array(
+            array(
+                'taxonomy' => 'product_cat',
+                'field' => 'term_id',
+                'terms' => 47,
+            ),
+            array(
+                'taxonomy' => 'pa_application-area',
+                'field' => 'term_id',
+                'terms' => $_GET['attribute']
+            ),
+        )
+    ));
+    $category_product_count = count($filtered_products->posts);
+} else {
+    $category_product_count = $current_category->count;
+}
+
+$price_range = true_category_price_range($current_category->slug);
 
 $product_vendors = new WP_Query([
     'post_type'     => 'vendors',
@@ -29,16 +52,20 @@ $product_vendors = new WP_Query([
 ]);
 
 $application_area = get_terms( 'pa_application-area', [
+    'tax_query' => array(
+        array(
+            'taxonomy' => 'product_cat',
+            'field' => 'term_id',
+            'terms' => $current_category->term_id,
+            'operator' => 'IN'
+        ),
+    ),
     'hide_empty' => false,
 ] );
 
 $apparatus_type = get_terms( 'pa_apparatus-type', [
     'hide_empty' => false,
 ] );
-
-//echo '<pre>';
-//print_r($application_area);
-//echo '</pre>';
 
 get_header();
 ?>
@@ -123,7 +150,7 @@ get_header();
                                         }
 
                                         foreach ( $vendors as $vendor ):
-                                            $vendor_product_count = count(get_vendor_product($vendor->ID));
+                                            $vendor_product_count = count(get_vendor_product($current_category->term_id, $vendor->ID));
                                             ?>
                                             <div class="filter__item_body_item">
                                             <input id="vendor-<?= $vendor->ID ?>" type="radio" value="<?= $vendor->ID ?>" name='f1'>
@@ -161,7 +188,7 @@ get_header();
                                         }
                                         foreach ( $attributes as $attr ): ?>
                                         <div class="filter__item_body_item">
-                                            <input id="attribute-<?= $attr->term_id ?>" type="checkbox" name="f2" value="<?= $attr->slug ?>">
+                                            <input id="attribute-<?= $attr->term_id ?>" <?php if ( $_GET['attribute'] == $attr->term_id ): ?> checked <?php endif; ?> type="checkbox" name="f2" value="<?= $attr->slug ?>">
                                             <label for="attribute-<?= $attr->term_id ?>">
                                                 <div class="icon"></div>
                                                 <div class="text"><?= $attr->name ?> <span>(<?= $attr->count ?>)</span></div>
@@ -186,7 +213,7 @@ get_header();
                                             <input id="type-<?= $type->term_id ?>" type="checkbox" name="f3" value="<?= $type->slug ?>">
                                             <label for="type-<?= $type->term_id ?>">
                                                 <div class="icon"></div>
-                                                <div class="text"><?= $type->name ?> <span>(<?= $type->count ?>)</span></div>
+                                                <div class="text"><?= $type->name ?> <span class="filter-">(<?= $type->count ?>)</span></div>
                                             </label>
                                         </div>
                                         <?php endforeach; ?>
@@ -198,7 +225,7 @@ get_header();
                                 <div class="filter__item">
                                     <div class="filter__item_info">
                                         Показано результатов
-                                        <span>(<?= $current_category->count ?>)</span>
+                                        <span>(<?= $category_product_count ?>)</span>
                                     </div>
                                     <div class="filter__item-action">
                                         <a class="filter__item-reset">сбросить</a>
@@ -232,6 +259,26 @@ get_header();
                         </div>
                         <div class="list__body_items">
                             <?php
+                            if ( $_GET['attribute'] ) :
+                                $products = new WP_Query(array(
+                                    'post_type' => 'product',
+                                    'posts_per_page' => '9',
+                                    'order' => 'asc',
+                                    'paged'=> get_query_var('page'),
+                                    'tax_query' => array(
+                                        array(
+                                            'taxonomy' => 'product_cat',
+                                            'field' => 'term_id',
+                                            'terms' => 47,
+                                        ),
+                                        array(
+                                            'taxonomy' => 'pa_application-area',
+                                            'field' => 'term_id',
+                                            'terms' => $_GET['attribute']
+                                        ),
+                                    )
+                                ));
+                            endif;
                              if($products->have_posts()):
                                 while ($products->have_posts()) :
                                     $products->the_post();
