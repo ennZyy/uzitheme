@@ -703,7 +703,7 @@ add_action( 'init', function() {
 
 } );
 
-function get_vendor_product($category_name, $vendor_id) {
+function get_vendor_product($vendor_id) {
     $vendor_products = [];
     $all_products = new WP_Query([
         'post_type'              => array( 'product' ),

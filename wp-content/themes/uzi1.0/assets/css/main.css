@@ -2256,7 +2256,7 @@ body {
 .pop__head_add {
   color: #5C82E4;
   font-size: 25px;
-  line-height: 32px;
+  line-height: 42px;
   cursor: pointer;
   text-align: left;
 }
@@ -2319,6 +2319,10 @@ body {
   top: calc(50% - 70px);
   right: 0px;
 }
+.pop__slider-only {
+  top: 50%;
+  right: -60px;
+}
 .pop__slider_pag {
   position: absolute;
   bottom: 0;
@@ -2376,7 +2380,7 @@ body {
     font-size: 22px;
     line-height: 29px;
   }
-  .pop__slider_nav {
+  .pop__slider_nav:not(.pop__slider-only) {
     display: none;
   }
 }
@@ -2388,6 +2392,7 @@ body {
   }
 }
 .qts__in {
+  position: relative;
   padding: 60px 0;
 }
 .qts__title {
@@ -2620,6 +2625,7 @@ body {
   font-size: 16px;
   line-height: 21px;
   color: #fff;
+  width: 65%;
 }
 .feed__body_link a {
   font-weight: 700;

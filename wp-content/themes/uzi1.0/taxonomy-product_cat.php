@@ -150,7 +150,7 @@ get_header();
                                         }
 
                                         foreach ( $vendors as $vendor ):
-                                            $vendor_product_count = count(get_vendor_product($current_category->term_id, $vendor->ID));
+                                            $vendor_product_count = count(get_vendor_product($vendor->ID));
                                             ?>
                                             <div class="filter__item_body_item">
                                             <input id="vendor-<?= $vendor->ID ?>" type="radio" value="<?= $vendor->ID ?>" name='f1'>
