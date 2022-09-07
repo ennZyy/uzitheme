@@ -63,7 +63,7 @@ get_header();
                                         получите бесплатную
                                         консультацию от&nbsp;наших специалистов
                                     </div>
-                                    <input type="tel" id="telInput" class="feed__body_input" placeholder="+7 (ХХХ) ХХХ ХХ ХХ">
+                                    <input type="tel" id="telInput" class="feed__body_input" placeholder="+7 (495) 555-55-55">
                                     <button class="feed__body_btn">
                                         Получить консультацию
                                     </button>

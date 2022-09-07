@@ -64,9 +64,20 @@ jQuery(document).ready(function ($) {
                 'data' : $(this).serialize()
             },
             success: function (response) {
-                console.log(response)
+                const reviewModal = $('.review-sent');
+                $(reviewModal).removeClass('review-sent--hide');
+
+                setTimeout(function(){
+                    if ( !$(reviewModal).hasClass('review-sent--hide') ) {
+                        $(reviewModal).addClass('review-sent--hide')
+                    }
+                }, 3000);
             }
         })
+    })
+
+    $('.review-sent__close').on('click', function () {
+        $('.review-sent').addClass('review-sent--hide')
     })
 
     $('.comment-answer-btn').on('click', cmAnswer())

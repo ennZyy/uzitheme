@@ -99,7 +99,7 @@ get_header();
                                     if ($i == 0){
                                         $products = array_slice($vendor_products, 0, 3);
                                     } elseif ($i == 1) {
-                                        $products = array_slice($vendor_products, 3);
+                                        $products = array_slice($vendor_products, 3, 99999);
                                     }
                                     foreach ( $products as $product ):
                                         $vendor_product = wc_get_product($product->ID);
@@ -215,24 +215,16 @@ get_header();
                                             </div>
                                             <div class="card__body_ex">
                                                 <div class="head">
-                                                    В категориях
+                                                    Подходит:
                                                 </div>
                                                 <?php if ( !empty($attributes) ): ?>
                                                 <ul class="list">
                                                     <?php
-                                                    foreach ( $attributes as $attribute_item ):
-                                                        foreach (wc_get_product_terms( $sensor_product->get_id(), $attribute_item->get_data()['name'], array( 'taxonomy' =>  'sensor-frequencies' ) ) as $value): ?>
-                                                            <?php
-                                                            if ( $value->taxonomy === 'pa_application-area' ):
-                                                                echo '<li class="list__item">— ' . $value->name . '</li>';
-                                                            endif;
+                                                    $similar_product = $sensor_product->get_upsell_ids();
 
-                                                            if ( $value->taxonomy === 'pa_suitable-device' && is_product_category(48) ) {
-                                                                echo '<li class="list__item">— ' . $value->name . '</li>';
-                                                            }
-
-                                                            ?>
-                                                        <?php endforeach;
+                                                    foreach ( $similar_product as $id ):
+                                                        $similar = wc_get_product($id);
+                                                        echo '<li class="list__item">— ' . $similar->get_title() . '</li>';
                                                     endforeach; ?>
                                                 </ul>
                                                 <?php endif; ?>

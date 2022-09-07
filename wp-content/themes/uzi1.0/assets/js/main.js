@@ -38,6 +38,7 @@ jQuery(document).ready(function ($) {
     })
 
     $('#modalTelInput').mask("+7 (999) 999-99-99");
+    $('#telInput').mask("+7 (999) 999-99-99");
 
     $('.search__btn').on('click', function (e) {
         e.preventDefault();

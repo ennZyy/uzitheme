@@ -6,7 +6,7 @@ $search_types = explode(',', $_GET['post_type']);
 $result_str = ' Поиск по фразе ' . '<span>“' . get_search_query() . '”</span>';
 $posts = [];
 foreach ( $search_types as $type ) {
-    $posts = new WP_Query(
+    $res= new WP_Query(
         [
             'post_type' => $type,
             'order'     => 'DESC',
@@ -14,10 +14,13 @@ foreach ( $search_types as $type ) {
             'sentence'  => $sentence
         ]
     );
+    $posts[] = $res->posts;
 }
 
-if ( empty($posts->posts) ) {
+if ( empty($posts[0]) && empty($posts[1]) ) {
     $result_str = ' Поиск по фразе ' . '<span>“' . get_search_query() . '” ничего не найдено</span>';
+} else {
+    $result_str = ' Поиск по фразе ' . '<span>“' . get_search_query() . '”';
 }
 
 get_header();
@@ -53,11 +56,6 @@ get_header();
                                     'sentence'  => $sentence
                                 ]
                             );
-
-                            if ( empty($post) ) {
-                                $nothing = "ничего не найдено";
-                                break;
-                            }
 
                             foreach ( $posts->posts as $post ):
                                 if ( $post->post_type == 'product' ):
@@ -124,10 +122,7 @@ get_header();
                                         <div class="art__img">
                                             <picture>
                                                 <source srcset="" type="image/webp">
-                                                <img
-                                                    src="<?= get_the_post_thumbnail($post->ID) ?>"
-                                                    alt="<?php $post->post_title ?>"
-                                                >
+                                                <?= get_the_post_thumbnail($post->ID, 'post-thumbnail', ['alt' => $post->post_title]); ?>
                                             </picture>
                                         </div>
                                         <div class="art__body">

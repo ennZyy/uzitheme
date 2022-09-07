@@ -3,13 +3,9 @@ $product = wc_get_product();
 $attributes = $product->get_attributes();
 $product_category = $product->get_category_ids();
 
-//echo '<pre>';
-//print_r($product_category);
-//echo '</pre>';
-
 $rating = get_field('rating', get_the_ID());
 ?>
-<a href="<?php the_permalink(); ?>" class="list__body_items_item card">
+<a href="<?php the_permalink(); ?>" class="list__body_items_item card" <?php if ( in_array(47, $product_category) ): ?> style="min-height: 400px" <?php else: ?> style="min-height: 466px" <?php endif; ?>>
     <div class="card__img">
         <picture>
             <source srcset="" type="image/webp">
@@ -45,7 +41,7 @@ $rating = get_field('rating', get_the_ID());
             </div>
         </div>
         <div class="card__body_ex">
-            <?php if (!in_array(48, $product_category)): ?>
+            <?php if ( !in_array(48, $product_category) ): ?>
                 <div class="head">
                     В категориях
                 </div>
@@ -56,20 +52,31 @@ $rating = get_field('rating', get_the_ID());
             <?php endif; ?>
             <ul class="list">
                 <?php
-                foreach ($attributes as $attribute_item):
-                    foreach (wc_get_product_terms($product->get_id(), $attribute_item->get_data()['name'], array('taxonomy' => 'sensor-frequencies')) as $value): ?>
-                        <?php
-                        if ($value->taxonomy === 'pa_application-area'):
-                            echo '<li class="list__item">— ' . $value->name . '</li>';
-                        endif;
+                if ( !in_array(48, $product_category) ):
+                    foreach ($attributes as $attribute_item):
+                        foreach (wc_get_product_terms($product->get_id(), $attribute_item->get_data()['name'], array('taxonomy' => 'sensor-frequencies')) as $value): ?>
+                            <?php
+                            if ($value->taxonomy === 'pa_application-area'):
+                                echo '<li class="list__item">— ' . $value->name . '</li>';
+                            endif;
 
-                        if ($value->taxonomy === 'pa_suitable-device' && is_product_category(48)) {
-                            echo '<li class="list__item">— ' . $value->name . '</li>';
-                        }
+                            if ($value->taxonomy === 'pa_suitable-device' && is_product_category(48)) {
+                                echo '<li class="list__item">— ' . $value->name . '</li>';
+                            }
 
-                        ?>
-                    <?php endforeach;
-                endforeach; ?>
+                            ?>
+                        <?php endforeach;
+                    endforeach;
+                else:
+                    $first_app = array_slice($product->get_upsell_ids(), 0, 2);
+                    foreach ( $first_app as $item ):
+                        $similar = wc_get_product($item);
+                    ?>
+                        <li class="list__item">— <?= $similar->get_title() ?></li>
+                <?php
+                endforeach;
+                endif;
+                ?>
             </ul>
             <div class="action product-action-consultation">
                 <button>

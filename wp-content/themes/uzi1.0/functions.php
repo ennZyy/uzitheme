@@ -850,7 +850,7 @@ function loadmore_get_posts(){
     foreach ($posts as $post) :
         $product = new WC_Product($post->ID);
         $attributes = $product->get_attributes();
-
+        $product_category = $product->get_category_ids();
         $rating = get_field('rating', get_the_ID());
     ?>
         <a href="<?= $product->get_permalink() ?>" class="list__body_items_item card" id="nercard">
@@ -870,18 +870,27 @@ function loadmore_get_posts(){
                             <div class="values__price">
                                 от <?php echo $product->get_price() . get_woocommerce_currency_symbol( $currency = '' ); ?>
                             </div>
+                        <?php if ( !in_array(48, $product_category) ): ?>
                         <div class="values__cnt">
                             <?php if ( !empty($rating) ): ?><span><?= $rating ?>/10</span><?php else: ?><span>0/10</span><?php endif; ?>
                         </div>
+                        <?php endif; ?>
                     </div>
                     <div class="link">
                         <div>Подробнее</div>
                     </div>
                 </div>
                 <div class="card__body_ex">
-                    <div class="head">
-                        В категориях
-                    </div>
+                    <?php if ( !in_array(48, $product_category) ): ?>
+                        <div class="head">
+                            В категориях
+                        </div>
+                    <?php else: ?>
+                        <div class="head">
+                            Подходит:
+                        </div>
+                    <?php endif; ?>
+
                     <?php if ( !empty( $attributes ) ): ?>
                     <ul class="list">
                         <?php
