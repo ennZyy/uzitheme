@@ -703,7 +703,7 @@ add_action( 'init', function() {
 
 } );
 
-function get_vendor_product($vendor_id) {
+function get_vendor_product($vendor_id, $category_id) {
     $vendor_products = [];
     $all_products = new WP_Query([
         'post_type'              => array( 'product' ),
@@ -712,10 +712,14 @@ function get_vendor_product($vendor_id) {
     ]);
 
     foreach ( $all_products->posts as $product ) {
+        $t_product = wc_get_product($product->ID);
         $product_meta = get_post_meta($product->ID);
+        $product_cat = $t_product->get_category_ids();
+//        echo '<pre>';
+//        print_r();
+//        echo '</pre>';
 
-//        $product_cat = wc_get_product_term_ids($product->ID, 'product_cat');
-        if ( isset($product_meta['product_vendor']) && !empty($product_meta['product_vendor']) && $product_meta['product_vendor'][0] == $vendor_id ) {
+        if ( $product_meta['product_vendor'] && $product_meta['product_vendor'][0] == $vendor_id && in_array($category_id, $product_cat) ) {
             $vendor_products[] = $product;
             $product->rating = $product_meta['rating'][0];
         }
