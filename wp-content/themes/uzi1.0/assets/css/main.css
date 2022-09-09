@@ -745,7 +745,7 @@ html {
 body {
   width: 100%;
   height: 100%;
-  overflow-x: hidden;
+  /*overflow-x: hidden;*/
   font-family: "GraphikLCG";
   font-weight: 400;
   color: #2F2F2F;
@@ -757,7 +757,7 @@ body {
 .wrapper {
   display: flex;
   flex-direction: column;
-  overflow-x: hidden;
+  /*overflow-x: hidden;*/
   height: 100%;
 }
 .wrapper .header {
@@ -5601,41 +5601,47 @@ body:not(.is-using-mouse) .fancybox__container :focus {
 .fancybox__container.has-slideshow .fancybox__button--slideshow g:nth-child(2) {
   display:block
 }
-.review-sent--hide {
+.review-sent--hide,
+.company-sent--hide {
   opacity: 0;
   visibility: hidden;
   height: 0;
 }
-.review-sent {
-  position: absolute;
+.review-sent,
+.company-sent {
+  position: fixed;
   bottom: 20px;
   left: 50%;
-  padding: 23px 61px;
-  margin-right: -50%;
-  transform: translate(-50%, -50%);
+  transform: translateY(-50%) translateX(-50%);
   background: #FFFFFF;
   box-shadow: 0px 15px 20px rgba(0, 0, 0, 0.1);
   border-radius: 10px;
   z-index: 2;
   transition: .3s;
+  max-width: 864px;
+  width: 100%;
 }
 @media (max-width: 768px) {
-  .review-sent {
+  .review-sent,
+  .company-sent{
     padding: 23px 23px;
   }
 }
 @media (min-width: 768px) {
-  .review-sent {
+  .review-sent,
+  .company-sent {
     padding: 23px 61px;
   }
 }
-.review-sent__text {
+.review-sent__text,
+.company-sent__text {
   font-weight: 400;
   font-size: 22px;
   line-height: 22px;
   color: #2F2F2F;
 }
-.review-sent .close {
+.review-sent .close,
+.company-sent .close {
   position: absolute;
   top: 0;
   right: 20px;
@@ -5657,5 +5663,21 @@ body:not(.is-using-mouse) .fancybox__container :focus {
   transform: rotate(45deg);
 }
 .review-sent .close:after {
+  transform: rotate(-45deg);
+}
+
+.company-sent .close:before, .close:after {
+  position: absolute;
+  top: 7px;
+  left: 15px;
+  content: ' ';
+  height: 18px;
+  width: 2px;
+  background-color: #333;
+}
+.company-sent .close:before {
+  transform: rotate(45deg);
+}
+.company-sent .close:after {
   transform: rotate(-45deg);
 }

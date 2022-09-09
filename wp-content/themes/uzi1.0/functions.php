@@ -703,7 +703,7 @@ add_action( 'init', function() {
 
 } );
 
-function get_vendor_product($vendor_id, $category_id) {
+function get_vendor_product($vendor_id, $category_id=47) {
     $vendor_products = [];
     $all_products = new WP_Query([
         'post_type'              => array( 'product' ),
@@ -715,9 +715,6 @@ function get_vendor_product($vendor_id, $category_id) {
         $t_product = wc_get_product($product->ID);
         $product_meta = get_post_meta($product->ID);
         $product_cat = $t_product->get_category_ids();
-//        echo '<pre>';
-//        print_r();
-//        echo '</pre>';
 
         if ( $product_meta['product_vendor'] && $product_meta['product_vendor'][0] == $vendor_id && in_array($category_id, $product_cat) ) {
             $vendor_products[] = $product;
@@ -811,8 +808,8 @@ function get_user_contact_page() {
             <th>Phone</th>
         </tr>
         <?php foreach ( $phones as $key => $phone ):
-            $phone_number = str_replace(array('+', ' ', '(' , ')', '-'), '', $phone['phones']);;
-        ?>
+            $phone_number = str_replace(array('+', ' ', '(' , ')', '-'), '', $phone['phones']);
+            ?>
         <tr>
             <th><?= $key ?></th>
             <th>
@@ -844,7 +841,10 @@ function get_wc_product_by_title( $title ){
 }
 
 function loadmore_get_posts(){
-    $args = unserialize(stripslashes($_POST['query']));
+    $jsonData = stripslashes(html_entity_decode($_POST['query']));
+
+    $args = json_decode($jsonData,true);
+
     $args['paged'] = $_POST['page'] + 1;
     $args['post_status'] = 'publish';
 
@@ -949,7 +949,9 @@ add_action('wp_ajax_loadmore', 'loadmore_get_posts');
 add_action('wp_ajax_nopriv_loadmore', 'loadmore_get_posts');
 
 function loadmore_featured(){
-    $args = unserialize(stripslashes($_POST['query']));
+    $jsonData = stripslashes(html_entity_decode($_POST['query']));
+
+    $args = json_decode($jsonData,true);
     $args['paged'] = $_POST['page'] + 1;
     $args['post_status'] = 'publish';
 
@@ -960,6 +962,12 @@ function loadmore_featured(){
         $attributes = $product->get_attributes();
 
         $rating = get_field('rating', get_the_ID());
+        $price = wc_price($product->get_regular_price(), [
+            'price_format'       => '%2$s',
+            'thousand_separator' => ' ',
+            'decimal_separator'  => ' ',
+            'decimals'           => 0
+        ]);
         ?>
         <a href="<?= $product->get_permalink() ?>" class="apr__item card" id="nercard">
             <div class="card__img">
@@ -976,8 +984,7 @@ function loadmore_featured(){
                     <div class="name"><?= $product->get_title(); ?></div>
                     <div class="values">
                         <div class="values__price">
-                            от <?php echo $product->get_price() . get_woocommerce_currency_symbol( $currency = '' ); ?>
-                        </div>
+                            от <?= $price . get_woocommerce_currency_symbol(); ?>                        </div>
                         <div class="values__cnt">
                             <?php if ( !empty($rating) ): ?><span><?= $rating ?>/10</span><?php else: ?><span>0/10</span><?php endif; ?>
                         </div>

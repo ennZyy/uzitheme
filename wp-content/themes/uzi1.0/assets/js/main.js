@@ -59,8 +59,12 @@ jQuery(document).ready(function ($) {
         console.log('hello')
     })
 
-    $('#loadmore').click(function(){
+    $(document).on('click', '#loadmore', function () {
         $(this).text('Загрузка...');
+
+        let posts_vars = $('input[name="posts_vars"]').val()
+        let current_page = $('input[name="current_page"]').val()
+        let max_pages = $('input[name="max_pages"]').val()
 
         var data = {
             'action': 'loadmore',
@@ -69,7 +73,7 @@ jQuery(document).ready(function ($) {
         };
         $.ajax({
             url: ajax_url['url'],
-            data:data,
+            data: data,
             type:'POST',
             success:function(data){
                 if(data) {
@@ -77,15 +81,25 @@ jQuery(document).ready(function ($) {
                     $('#loadmore').text('Показать ещё');
                     current_page++;
                     if (current_page == max_pages) $("#loadmore").remove();
+
+                    let items = document.querySelectorAll('.list__body_items_item');
+
+                    let count = items.length;
+                    $('.filter__item_info span').text(`(${count})`);
                 } else {
                     $('#loadmore').remove();
                 }
             }
         });
-    });
+    })
 
     $('#home-loadmore').click(function(){
         $(this).text('Загрузка...');
+
+        let posts_vars = $('input[name="posts_vars"]').val()
+        let current_page = $('input[name="current_page"]').val()
+        let max_pages = $('input[name="max_pages"]').val()
+
 
         var data = {
             'action': 'loadmore_featured',
@@ -137,6 +151,10 @@ jQuery(document).ready(function ($) {
 
     $('#vendor-loadmore').click(function () {
         $(this).text('Загрузка...');
+
+        let posts_vars = $('input[name="posts_vars"]').val()
+        let current_page = $('input[name="current_page"]').val()
+        let max_pages = $('input[name="max_pages"]').val()
 
         var data = {
             'action': 'loadmore',
@@ -286,7 +304,12 @@ jQuery(document).ready(function ($) {
             }
         }).done(function (data) {
             console.log(data);
-            $('.addc').removeClass('active')
+            $('.addc').removeClass('active');
+            $('.company-sent').removeClass('company-sent--hide')
+
+            setTimeout(function(){
+                $('.company-sent').addClass('company-sent--hide')
+            }, 3000);
         })
     })
 
@@ -329,7 +352,7 @@ jQuery(document).ready(function ($) {
             if ( $(el).prop('checked') ) {
                 count++;
                 if ( count > 1 ) {
-                    url += ';'+$(el).val();
+                    url += '&type='+$(el).val();
                 } else {
                     url += '&type='+$(el).val();
                 }
@@ -340,10 +363,28 @@ jQuery(document).ready(function ($) {
             type: 'POST',
             url: url,
             success: function(response) {
-                let count = (response.match(/list__body_items_item/g) || []).length;
+                let result = JSON.parse(response);
+                let postsVars = result["posts_vars"];
+                let currentPage = result["current_page"];
+                let max_pages = result["max_pages"];
+                let wrapper = $('.list__body_items');
 
-                // $('#loadmore').remove();
-                $('.list__body_items').html(response);
+                wrapper.html(result['html']);
+
+                $('input[name="posts_vars"]').val(JSON.stringify(postsVars));
+                $('input[name="max_pages"]').val(max_pages);
+                let current_page = $('input[name="current_page"]').val()
+                current_page = currentPage;
+
+                if (current_page == max_pages) {
+                    $("#loadmore").remove();
+                } else {
+                    if ( !$('#loadmore').length ) {
+                        $('.list__body_action').append('<button id="loadmore">Показать ещё</button>')
+                    }
+                }
+
+                let count = (result['html'].match(/list__body_items_item/g) || []).length;
                 $('.filter__item_info span').text(`(${count})`);
             }
         })
@@ -370,10 +411,31 @@ jQuery(document).ready(function ($) {
             type: 'POST',
             url: ajax_url['url'] + '/?action=get_all_apparatus&category_id='+categoryId,
             success: function(response) {
-                let count = (response.match(/list__body_items_item/g) || []).length;
-                $('.list__body_items').html(response)
-                $('body input:checkbox').prop('checked', false);
-                $('.filter__item_info span').text(`(${count})`)
+                let result = JSON.parse(response);
+                let postsVars = result["posts_vars"];
+                let currentPage = result["current_page"];
+                let max_pages = result["max_pages"];
+                let wrapper = $('.list__body_items');
+
+                console.log(result)
+
+                wrapper.html(result['html']);
+
+                $('input[name="posts_vars"]').val(JSON.stringify(postsVars));
+                $('input[name="max_pages"]').val(max_pages);
+                let current_page = $('input[name="current_page"]').val()
+                current_page = currentPage;
+
+                if (current_page == max_pages) {
+                    $("#loadmore").remove();
+                } else {
+                    if ( !$('#loadmore').length ) {
+                        $('.list__body_action').append('<button id="loadmore">Показать ещё</button>')
+                    }
+                }
+
+                let count = (result['html'].match(/list__body_items_item/g) || []).length;
+                $('.filter__item_info span').text(`(${count})`);
             }
         })
     })

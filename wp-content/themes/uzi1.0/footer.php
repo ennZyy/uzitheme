@@ -232,6 +232,13 @@ $phone = str_replace(array('+', ' ', '(', ')', '-'), '', $footer_settings['conta
     <p class="review-sent__text">Ваша компания отправлена, после модерации мы добавим ее на сайт</p>
 </div>
 <!-- Конец Popup "Ваш отзыв отправлен, после модерации он появится на сайте" -->
+
+<!-- Popup "Ваша компания отправлена, после модерации мы добавим ее на сайт" -->
+<div class="company-sent company-sent--hide">
+    <i class="company-sent__close close"></i>
+    <p class="company-sent__text">Ваша компания отправлена, после модерации мы добавим ее на сайт</p>
+</div>
+<!-- Конец Popup "Ваша компания отправлена, после модерации мы добавим ее на сайт" -->
 <script src="https://cdn.jsdelivr.net/npm/jquery.maskedinput@1.4.1/src/jquery.maskedinput.min.js" type="text/javascript"></script>
 <?php wp_footer(); ?>
 

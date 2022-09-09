@@ -64,10 +64,6 @@ $about_us_settings = get_field('aboutus_settings');
                                 'hide_empty' => false,
                             ] );
 
-//                            echo '<pre>';
-//                            print_r($application_area);
-//                            echo '</pre>';
-
                             $block_class = '';
                             for ($i=0; $i < 3; $i++) :
                                 $block_class = match ($i) {
@@ -87,15 +83,33 @@ $about_us_settings = get_field('aboutus_settings');
                                     } elseif ($i == 2) {
                                         $categories = array_slice($application_area, 5, 3);
                                     }
-
+                                    $products_attr = '';
                                     foreach ($categories as $category_id):
                                         $category = get_term_by( 'slug', $category_id->slug, 'product_cat' );
 
                                         $thumbnail_id = get_woocommerce_term_meta($category->term_id, 'thumbnail_id', true);
                                         $image = wp_get_attachment_url($thumbnail_id);
+                                        $products_attr = new WP_Query(array(
+                                            'post_type' => 'product',
+                                            'tax_query' => array(
+                                                'relation' => 'AND',
+                                                array(
+                                                    'taxonomy' => 'product_cat',
+                                                    'field' => 'term_id',
+                                                    'terms' => 47,
+                                                ),
+                                                array(
+                                                    'taxonomy' => 'pa_application-area',
+                                                    'field' => 'slug',
+                                                    'terms' => $category_id->slug
+                                                )
+                                            ),
+                                        ));
+
+                                        $product_count = $products_attr->found_posts;
                                         ?>
                                         <a href="/product-category/ultrasound-machines/?attribute=<?= $category_id->term_id ?>" class="item w-l" style="background-image: url('<?= $image ?>');">
-                                            <div class="item__value"><?= $category_id->name ?> <span>(<?= $category_id->count ?>)</span></div>
+                                            <div class="item__value"><?= $category_id->name ?> <span>(<?= $product_count ?>)</span></div>
                                         </a>
                                     <?php endforeach; ?>
                                 </div>
@@ -349,11 +363,9 @@ $about_us_settings = get_field('aboutus_settings');
                         <?php endif; ?>
                     </div>
                     <?php if ($featured->max_num_pages > 1) : ?>
-                        <script>
-                            var posts_vars = '<?php echo serialize($featured->query_vars); ?>';
-                            var current_page = <?php echo (get_query_var('paged')) ? get_query_var('paged') : 1; ?>;
-                            var max_pages = '<?php echo $featured->max_num_pages; ?>';
-                        </script>
+                        <input type="hidden" value='<?php echo json_encode($featured->query_vars); ?>' name="posts_vars">
+                        <input type="hidden" value="<?php echo (get_query_var('paged')) ? get_query_var('paged') : 1; ?>" name="current_page">
+                        <input type="hidden" value="<?php echo $featured->max_num_pages; ?>" name="max_pages">
                         <div class="apr__action">
                             <button id="home-loadmore">Показать еще</button>
                         </div>

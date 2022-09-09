@@ -65,11 +65,10 @@ get_header();
                     </div>
                     <?php if ($wpb_all_query->max_num_pages > 1) : ?>
                         <div class="articles__action">
-                            <script>
-                                var posts_vars = '<?php echo serialize($wpb_all_query->query_vars); ?>';
-                                var current_page = <?php echo (get_query_var('paged')) ? get_query_var('paged') : 1; ?>;
-                                var max_pages = '<?php echo $wpb_all_query->max_num_pages; ?>';
-                            </script>
+                            <input type="hidden" value='<?php echo json_encode($wpb_all_query->query_vars); ?>' name="posts_vars">
+                            <input type="hidden" value="<?php echo (get_query_var('paged')) ? get_query_var('paged') : 1; ?>" name="current_page">
+                            <input type="hidden" value="<?php echo $wpb_all_query->max_num_pages; ?>" name="max_pages">
+
                             <button id="blog-loadmore" class="articles__action_btn">Показать ещё</button>
                         </div>
                     <?php endif; ?>

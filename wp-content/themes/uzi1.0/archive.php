@@ -64,6 +64,9 @@ get_header();
                             var current_page = <?php echo (get_query_var('paged')) ? get_query_var('paged') : 1; ?>;
                             var max_pages = '<?php echo $vendors_query->max_num_pages; ?>';
                         </script>
+                        <input type="hidden" value='<?php echo json_encode($vendors_query->query_vars); ?>' name="posts_vars">
+                        <input type="hidden" value="<?php echo (get_query_var('paged')) ? get_query_var('paged') : 1; ?>" name="current_page">
+                        <input type="hidden" value="<?php echo $vendors_query->max_num_pages; ?>" name="max_pages">
                         <button id="vendor-loadmore">Показать ещё</button>
                     <?php endif; ?>
                 </div>

@@ -3,9 +3,16 @@ $product = wc_get_product();
 $attributes = $product->get_attributes();
 $product_category = $product->get_category_ids();
 
+$price = wc_price($product->get_regular_price(), [
+    'price_format'       => '%2$s',
+    'thousand_separator' => ' ',
+    'decimal_separator'  => ' ',
+    'decimals'           => 0
+]);
+
 $rating = get_field('rating', get_the_ID());
 ?>
-<a href="<?php the_permalink(); ?>" class="list__body_items_item card" <?php if ( in_array(47, $product_category) ): ?> style="min-height: 400px" <?php else: ?> style="min-height: 466px" <?php endif; ?>>
+<a href="<?php the_permalink(); ?>" class="list__body_items_item card" <?php if ( in_array(47, $product_category) ): ?> style="max-height: 200px; height: 100%;" <?php else: ?> style="max-height: 200px; height: 100%;" <?php endif; ?>>
     <div class="card__img">
         <picture>
             <source srcset="" type="image/webp">
@@ -19,16 +26,9 @@ $rating = get_field('rating', get_the_ID());
         <div class="card__body_main">
             <div class="name" <?php if (strlen($product->get_title()) > 30): ?> style="line-height: 29px;" <?php endif; ?>><?= the_title(); ?></div>
             <div class="values">
-                <?php if ($product->is_type('variable')): ?>
                     <div class="values__price">
-                        от <?php $price = $product->get_variation_price('min');
-                        echo ($price > 30) ? explode('.', $price)[0] : '30' ?>
+                        от <?= $price . get_woocommerce_currency_symbol(); ?>
                     </div>
-                <?php else: ?>
-                    <div class="values__price">
-                        от <?php echo $product->get_regular_price() . get_woocommerce_currency_symbol($currency = ''); ?>
-                    </div>
-                <?php endif; ?>
                 <?php if (!in_array(48, $product_category)): ?>
                     <div class="values__cnt">
                         <?php if (!empty($rating)): ?><span><?= $rating ?>/10</span><?php else: ?>

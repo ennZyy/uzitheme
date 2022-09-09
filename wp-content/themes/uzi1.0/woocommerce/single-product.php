@@ -156,8 +156,7 @@ get_header();
                                     <div class="prod__main_descr_part">
                                         <div class="head">Цена <?= get_woocommerce_currency_symbol(); ?></div>
                                         <div class="value">
-                                            от <?= $price ?> <?php if (!empty($rating)): ?><span><?= $rating ?>
-                                                /10</span><?php else: ?><span>0/10</span><?php endif; ?>
+                                            от <?= $price ?> <?php if (!empty($rating)): ?><span><?= $rating ?>/10</span><?php else: ?><span>0/10</span><?php endif; ?>
                                         </div>
                                         <div class="ex">*точную цену узнайте на консультации</div>
                                     </div>
@@ -185,7 +184,7 @@ get_header();
                                         <div class="head">Характеристики</div>
                                         <div class="list">
                                             <div class="list__item">Производитель: <?php if ($vendor) {
-                                                    $vendor->post_title;
+                                                    echo $vendor->post_title;
                                                 } else {
                                                     echo 'Производитель не указан';
                                                 } ?></div>

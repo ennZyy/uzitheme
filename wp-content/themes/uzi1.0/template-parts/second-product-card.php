@@ -2,6 +2,13 @@
 $product = wc_get_product();
 $product_attributes = $product->get_attributes();
 $rating = get_field('rating', get_the_ID());
+
+$price = wc_price($product->get_regular_price(), [
+    'price_format'       => '%2$s',
+    'thousand_separator' => ' ',
+    'decimal_separator'  => ' ',
+    'decimals'           => 0
+]);
 ?>
 
 <a href="<?php the_permalink(); ?>" class="apr__item card">
@@ -18,15 +25,9 @@ $rating = get_field('rating', get_the_ID());
         <div class="card__body_main">
             <div class="name"><?= the_title(); ?></div>
             <div class="values">
-                <?php if ($product->is_type( 'variable' )): ?>
                     <div class="values__price">
-                        от <?php $price = $product->get_variation_price('min'); echo ($price > 30) ? explode('.', $price)[0] : '30' ?>
+                        от <?= $price . get_woocommerce_currency_symbol(); ?>
                     </div>
-                <?php else: ?>
-                    <div class="values__price">
-                        от <?php echo $product->get_regular_price() . get_woocommerce_currency_symbol( $currency = '' ); ?>
-                    </div>
-                <?php endif; ?>
                 <div class="values__cnt">
                     <?php if ( !empty($rating) ): ?><span><?= $rating ?>/10</span><?php else: ?><span>0/10</span><?php endif; ?>
                 </div>

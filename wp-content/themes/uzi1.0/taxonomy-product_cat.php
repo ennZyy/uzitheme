@@ -18,8 +18,6 @@ $products = new WP_Query(array(
     )
 ));
 
-$category_product_count = '';
-
 if ($_GET['attribute']) {
     $filtered_products = new WP_Query(array(
         'post_type' => 'product',
@@ -62,10 +60,6 @@ $application_area = get_terms('pa_application-area', [
     ),
     'hide_empty' => false,
 ]);
-
-//echo '<pre>';
-//print_r($application_area);
-//echo '</pre>';
 
 $apparatus_type = get_terms('pa_apparatus-type', [
     'hide_empty' => false,
@@ -167,7 +161,7 @@ get_header();
                                                 $vendor_product_count = count(get_vendor_product($vendor->ID, $current_category->term_id));
                                                 ?>
                                                 <div class="filter__item_body_item">
-                                                    <input id="vendor-<?= $vendor->ID ?>" type="radio"
+                                                    <input id="vendor-<?= $vendor->ID ?>" type="checkbox"
                                                            value="<?= $vendor->ID ?>" name='f1'>
                                                     <label for="vendor-<?= $vendor->ID ?>">
                                                         <div class="icon"></div>
@@ -202,25 +196,26 @@ get_header();
                                             } elseif ($i == 1) {
                                                 $attributes = array_slice($application_area, 4);
                                             }
+                                            $products_attr = '';
                                             foreach ($attributes as $attr):
                                                 $products_attr = new WP_Query(array(
                                                     'post_type' => 'product',
                                                     'tax_query' => array(
+                                                        'relation' => 'AND',
                                                         array(
                                                             'taxonomy' => 'product_cat',
                                                             'field' => 'term_id',
                                                             'terms' => $current_category->term_id,
-                                                            'operator' => 'IN'
                                                         ),
                                                         array(
                                                             'taxonomy' => 'pa_application-area',
-                                                            'field' => 'term_id',
-                                                            'terms' => $attr->term_id
+                                                            'field' => 'slug',
+                                                            'terms' => $attr->slug
                                                         )
-                                                    )
+                                                    ),
                                                 ));
 
-                                                $product_count = count($products_attr->posts);
+                                                $product_count = $products_attr->found_posts;
                                                 ?>
                                                 <div class="filter__item_body_item">
                                                     <input id="attribute-<?= $attr->term_id ?>" <?php if ($_GET['attribute'] == $attr->term_id): ?> checked <?php endif; ?>
@@ -348,11 +343,9 @@ get_header();
                         </div>
                         <div class="list__body_action">
                             <?php if ($products->max_num_pages > 1) : ?>
-                                <script>
-                                    var posts_vars = '<?php echo serialize($products->query_vars); ?>';
-                                    var current_page = <?php echo (get_query_var('paged')) ? get_query_var('paged') : 1; ?>;
-                                    var max_pages = '<?php echo $products->max_num_pages; ?>';
-                                </script>
+                                <input type="hidden" value='<?php echo json_encode($products->query_vars); ?>' name="posts_vars">
+                                <input type="hidden" value="<?php echo (get_query_var('paged')) ? get_query_var('paged') : 1; ?>" name="current_page">
+                                <input type="hidden" value="<?php echo $products->max_num_pages; ?>" name="max_pages">
                                 <button id="loadmore">Показать ещё</button>
                             <?php endif; ?>
                         </div>

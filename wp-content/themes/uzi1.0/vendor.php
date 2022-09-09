@@ -44,22 +44,33 @@ get_header();
                                 </picture>
                             </div>
                             <div class="vendor__body_ps_descr">
+                                <?php if ( $vendor_information['vendor_phone'] ): ?>
                                 <a href="tel:" class="link">
                                     <div class="link__name">Телефон: </div>
                                     <div class="link__value"><?= $vendor_information['vendor_phone'] ?></div>
                                 </a>
+                                <?php endif; ?>
+
+                                <?php if ( $vendor_information['vendor_email'] ): ?>
                                 <a href="mailto" class="link">
                                     <div class="link__name">Email: </div>
                                     <div class="link__value"><?= $vendor_information['vendor_email'] ?></div>
                                 </a>
+                                <?php endif; ?>
+
+                                <?php if ( $vendor_information['vendor_web-site'] ): ?>
                                 <a href="" class="link">
                                     <div class="link__name">Сайт: </div>
                                     <div class="link__value"><?= $vendor_information['vendor_web-site'] ?></div>
                                 </a>
+                                <?php endif; ?>
+
+                                <?php if ( $vendor_information['vendor_address'] ): ?>
                                 <div class="nolink">
                                     <div class="nolink__name">Адрес: </div>
                                     <div class="nolink__value"><?= $vendor_information['vendor_address'] ?></div>
                                 </div>
+                                <?php endif; ?>
                             </div>
                         </div>
                         <div class="vendor__body_list">

@@ -238,23 +238,23 @@ function post_user_request()
 
 function post_registration_vendor()
 {
-    $uploaddir = '../files-manager/';
+    $uploaddir = '../wp-content/uploads/2022/';
 
     if (!is_dir($uploaddir)) mkdir($uploaddir, 775);
 
     $files = $_FILES;
     $done_files = [];
     $status = '';
+    $vendor_img = '';
 
     foreach ($files as $file) {
         $file_name = $file['name'];
 
         if (move_uploaded_file($file['tmp_name'], "$uploaddir/$file_name")) {
             $done_files[] = realpath("$uploaddir/$file_name");
+            $vendor_img = get_site_url() . $uploaddir . $file_name;
         }
     }
-
-    $vendor_img = str_replace('\\', "/", $done_files[0]);
 
     $vendor_id = wp_insert_post([
         'post_type' => 'vendors',
@@ -263,8 +263,11 @@ function post_registration_vendor()
     ]);
     $img_tag = '';
     if ($vendor_id) {
-        $img_tag = media_sideload_image($vendor_img, $vendor_id, 'Логотип ' . $_POST['name']);
-        $status = 'ok';
+        $img_tag = media_sideload_image($vendor_img, $vendor_id, 'Логотип ' . $_POST['name'], 'id');
+        set_post_thumbnail($vendor_id, $img_tag);
+        $status = [
+            'status' => 'ok',
+        ];
     } else {
         $status = 'error';
     }
@@ -298,6 +301,15 @@ function post_add_reply()
 
 function filter_apparatus()
 {
+    $result = [
+        'html'          => '',
+        'count'         => '',
+        'posts_vars'    => '',
+        'current_page'  => '',
+        'max_pages'     => '',
+        'status'        => ''
+    ];
+
     $min = '';
     $max = '';
     $vendor = '';
@@ -312,17 +324,10 @@ function filter_apparatus()
             'terms' => $_GET['category_id'],
         ]
     ];
-    if (isset($_GET['min'])) {
-        $min = $_GET['min'];
-    } else {
-        $min = 0;
-    }
 
-    if (isset($_GET['max'])) {
-        $max = $_GET['max'];
-    } else {
-        $max = 99999999;
-    }
+    $min = $_GET['min'] ?? 0;
+
+    $max = $_GET['max'] ?? 99999999;
 
     if (isset($_GET['vendor']) && !empty($_GET['vendor'])) {
         $vendor = $_GET['vendor'];
@@ -342,6 +347,7 @@ function filter_apparatus()
                 ];
             }
         }
+
     } else {
         $attributes = '';
     }
@@ -362,49 +368,93 @@ function filter_apparatus()
         $type = '';
     }
 
-    $products = new WP_Query(array(
-        'post_type' => 'product',
-        'posts_per_page' => '-1',
-        'meta_key' => '_price',
-        'order' => 'asc',
-        'paged' => get_query_var('page'),
-        'tax_query' => $args,
-        'meta_query' => [
+
+
+    if ( empty($vendor) ) {
+        $meta_query = [
+            'key' => '_price',
+            'value' => [$min, $max],
+            'compare' => 'BETWEEN',
+            'type' => 'DECIMAL(10,' . wc_get_price_decimals() . ')'
+        ];
+    } else {
+        $meta_query = [
             [
                 'key' => '_price',
                 'value' => [$min, $max],
                 'compare' => 'BETWEEN',
                 'type' => 'DECIMAL(10,' . wc_get_price_decimals() . ')'
+            ],
+            [
+                'key' => 'product_vendor',
+                'value' => $vendor,
             ]
-        ]
+        ];
+    }
+
+    $products = new WP_Query(array(
+        'post_type' => 'product',
+        'posts_per_page' => '9',
+        'meta_key' => '_price',
+        'order' => 'asc',
+        'paged' => get_query_var('page'),
+        'tax_query' => $args,
+        'meta_query' => $meta_query
     ));
 
+    $html = '';
     foreach ($products->posts as $product) :
         $wc_product = wc_get_product($product->ID);
         $attributes = $wc_product->get_attributes();
 
-        $rating = get_field('rating', get_the_ID());
-        if ( empty($vendor) ):
-        ?>
-        <a href="<?= $wc_product->get_permalink() ?>" class="list__body_items_item card">
+        $attr_html = '';
+        foreach ($attributes as $attribute_item) {
+            foreach (wc_get_product_terms($wc_product->get_id(), $attribute_item->get_data()['name'], array('taxonomy' => 'sensor-frequencies')) as $value) {
+                if ($value->taxonomy === 'pa_application-area') {
+                    $attr_html .= '<li class="list__item">— ' . $value->name . '</li>';
+                }
+
+                if ($value->taxonomy === 'pa_suitable-device' && is_product_category(48)) {
+                    $attr_html .= '<li class="list__item">— ' . $value->name . '</li>';
+                }
+            }
+        }
+
+        $price = wc_price($wc_product->get_regular_price(), [
+            'price_format'       => '%2$s',
+            'thousand_separator' => ' ',
+            'decimal_separator'  => ' ',
+            'decimals'           => 0
+        ]);
+
+        if ( empty($vendor) ) {
+            $rating = get_field('rating', $product->ID);
+            if ( $rating ) {
+                $rating_html = '<span>' . $rating . "/10</span>";
+            } else {
+                $rating_html = '<span>0/10</span>';
+            }
+
+            $html .= '
+                <a href="' . $wc_product->get_permalink() . '" class="list__body_items_item card">
             <div class="card__img">
                 <picture>
                     <source srcset="" type="image/webp">
                     <img
-                            src="<?= wp_get_attachment_url($wc_product->get_image_id()); ?>"
-                            alt="<?= $wc_product->get_title() ?>"
+                            src="' . wp_get_attachment_url($wc_product->get_image_id()) . '"
+                            alt="' . $wc_product->get_title() . '"
                     >
                 </picture>
             </div>
             <div class="card__body">
                 <div class="card__body_main">
-                    <div class="name"><?= $wc_product->get_title() ?></div>
+                    <div class="name">' . $wc_product->get_title() . '</div>
                     <div class="values">
                         <div class="values__price">
-                            от <?php echo $wc_product->get_regular_price() . get_woocommerce_currency_symbol($currency = ''); ?>
+                            от ' . $price . get_woocommerce_currency_symbol($currency = '') . '
                         </div>
                         <div class="values__cnt">
-                            <?php if (!empty($rating) && is_product_category(47)): ?><span><?= $rating ?>/10</span><?php else: ?><span>0/10</span><?php endif; ?>
+                            ' . $rating_html . '
                         </div>
                     </div>
                     <div class="link">
@@ -416,21 +466,7 @@ function filter_apparatus()
                         В категориях
                     </div>
                     <ul class="list">
-                        <?php
-                        foreach ($attributes as $attribute_item):
-                            foreach (wc_get_product_terms($wc_product->get_id(), $attribute_item->get_data()['name'], array('taxonomy' => 'sensor-frequencies')) as $value): ?>
-                                <?php
-                                if ($value->taxonomy === 'pa_application-area'):
-                                    echo '<li class="list__item">— ' . $value->name . '</li>';
-                                endif;
-
-                                if ($value->taxonomy === 'pa_suitable-device' && is_product_category(48)) {
-                                    echo '<li class="list__item">— ' . $value->name . '</li>';
-                                }
-
-                                ?>
-                            <?php endforeach;
-                        endforeach; ?>
+                        ' . $attr_html . '
                     </ul>
                     <div class="action">
                         <button>
@@ -439,85 +475,99 @@ function filter_apparatus()
                     </div>
                 </div>
             </div>
+        </a>';
 
-        </a>
-    <?php
-    else:
-        $product_meta = get_post_meta($product->ID);
+        $result['count'] = count($products->posts);
+        $result['posts_vars'] = $products->query_vars;
+        } else {
+            $t_product = wc_get_product($product->ID);
+            $product_meta = get_post_meta($product->ID);
+            $product_cat = $t_product->get_category_ids();
 
-        if ( isset($product_meta['product_vendor']) && !empty($product_meta['product_vendor']) && $product_meta['product_vendor'][0] == $vendor ) :?>
-            <a href="<?= $wc_product->get_permalink() ?>" class="list__body_items_item card">
-                <div class="card__img">
-                    <picture>
-                        <source srcset="" type="image/webp">
-                        <img
-                                src="<?= wp_get_attachment_url($wc_product->get_image_id()); ?>"
-                                alt="<?= $wc_product->get_title() ?>"
-                        >
-                    </picture>
-                </div>
-                <div class="card__body">
-                    <div class="card__body_main">
-                        <div class="name"><?= $wc_product->get_title() ?></div>
-                        <div class="values">
-                            <div class="values__price">
-                                от <?php echo $wc_product->get_regular_price() . get_woocommerce_currency_symbol($currency = ''); ?>
+            if ( $product_meta['product_vendor'] && $vendor == $product_meta['product_vendor'][0] && in_array($_GET['category_id'], $product_cat) || $vendor == $product_meta['vendor'][0]) {
+                $rating = get_field('rating', $product->ID);
+                if ( $rating ) {
+                    $rating_html = '<span>' . $rating . "/10</span>";
+                } else {
+                    $rating_html = '<span>0/10</span>';
+                }
+
+                $price = wc_price($wc_product->get_regular_price(), [
+                    'price_format'       => '%2$s',
+                    'thousand_separator' => ' ',
+                    'decimal_separator'  => ' ',
+                    'decimals'           => 0
+                ]);
+
+                $html .= '<a href="' . $wc_product->get_permalink() . '" class="list__body_items_item card">
+                    <div class="card__img">
+                        <picture>
+                            <source srcset="" type="image/webp">
+                            <img
+                                    src="' . wp_get_attachment_url($wc_product->get_image_id()) . '"
+                                    alt="' . $wc_product->get_title() . '"
+                            >
+                        </picture>
+                    </div>
+                    <div class="card__body">
+                        <div class="card__body_main">
+                            <div class="name">' . $wc_product->get_title() . '</div>
+                            <div class="values">
+                                <div class="values__price">
+                                    от ' . $price . get_woocommerce_currency_symbol($currency = '') . '
+                                </div>
+                                <div class="values__cnt">
+                                    ' . $rating_html . '
+                                </div>
                             </div>
-                            <div class="values__cnt">
-                                <?php if (!empty($rating) && is_product_category(47)): ?><span><?= $rating ?>/10</span><?php else: ?><span>0/10</span><?php endif; ?>
+                            <div class="link">
+                                <div>Подробнее</div>
                             </div>
                         </div>
-                        <div class="link">
-                            <div>Подробнее</div>
+                        <div class="card__body_ex">
+                            <div class="head">
+                                В категориях
+                            </div>
+                            <ul class="list">
+                                ' . $attr_html . '
+                            </ul>
+                            <div class="action">
+                                <button>
+                                    Консультация в один клик
+                                </button>
+                            </div>
                         </div>
                     </div>
-                    <div class="card__body_ex">
-                        <div class="head">
-                            В категориях
-                        </div>
-                        <ul class="list">
-                            <?php
-                            foreach ($attributes as $attribute_item):
-                                foreach (wc_get_product_terms($wc_product->get_id(), $attribute_item->get_data()['name'], array('taxonomy' => 'sensor-frequencies')) as $value): ?>
-                                    <?php
-                                    if ($value->taxonomy === 'pa_application-area'):
-                                        echo '<li class="list__item">— ' . $value->name . '</li>';
-                                    endif;
 
-                                    if ($value->taxonomy === 'pa_suitable-device' && is_product_category(48)) {
-                                        echo '<li class="list__item">— ' . $value->name . '</li>';
-                                    }
+                </a>';
 
-                                    ?>
-                                <?php endforeach;
-                            endforeach; ?>
-                        </ul>
-                        <div class="action">
-                            <button>
-                                Консультация в один клик
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
-            </a>
-        <?php
-        endif;
-    ?>
-
-    <?php
-        endif;
+                $result['count'] = count($products->posts);
+                $result['posts_vars'] = $products->query_vars;
+            }
+        }
     endforeach;
-    wp_die();
+
+    $result['html'] = $html;
+    $result['current_page'] = get_query_var('paged') ? get_query_var('paged') : 1;
+    $result['max_pages'] = $products->max_num_pages;
+
+    wp_die(json_encode($result));
 }
 
 function get_all_apparatus()
 {
+    $result = [
+        'html'          => '',
+        'count'         => '',
+        'posts_vars'    => '',
+        'current_page'  => '',
+        'max_pages'     => '',
+        'status'        => ''
+    ];
+
     $products = new WP_Query(array(
         'post_type' => 'product',
         'posts_per_page' => '9',
-        'orderby' => 'meta_value_num',
-        'meta_key' => '_price',
         'order' => 'asc',
         'paged' => get_query_var('page'),
         'tax_query' => array(
@@ -525,19 +575,93 @@ function get_all_apparatus()
                 'taxonomy' => 'product_cat',
                 'field' => 'term_id',
                 'terms' => $_GET['category_id'],
-                'operator' => 'IN'
             ),
         )
     ));
 
-    if ($products->have_posts()) {
-        while ($products->have_posts()) {
-            $products->the_post();
-            get_template_part('template-parts/category-product', 'card');
-        }
-    }
+    $html = '';
+    foreach ($products->posts as $product) :
+        $wc_product = wc_get_product($product->ID);
+        $attributes = $wc_product->get_attributes();
 
-    wp_die();
+        $attr_html = '';
+        foreach ($attributes as $attribute_item) {
+            foreach (wc_get_product_terms($wc_product->get_id(), $attribute_item->get_data()['name'], array('taxonomy' => 'sensor-frequencies')) as $value) {
+                if ($value->taxonomy === 'pa_application-area') {
+                    $attr_html .= '<li class="list__item">— ' . $value->name . '</li>';
+                }
+
+                if ($value->taxonomy === 'pa_suitable-device' && is_product_category(48)) {
+                    $attr_html .= '<li class="list__item">— ' . $value->name . '</li>';
+                }
+            }
+        }
+
+        $price = wc_price($wc_product->get_regular_price(), [
+            'price_format'       => '%2$s',
+            'thousand_separator' => ' ',
+            'decimal_separator'  => ' ',
+            'decimals'           => 0
+        ]);
+
+        $rating = get_field('rating', $product->ID);
+        if ( $rating ) {
+            $rating_html = '<span>' . $rating . "/10</span>";
+        } else {
+            $rating_html = '<span>0/10</span>';
+        }
+
+        $html .= '
+                <a href="' . $wc_product->get_permalink() . '" class="list__body_items_item card">
+            <div class="card__img">
+                <picture>
+                    <source srcset="" type="image/webp">
+                    <img
+                            src="' . wp_get_attachment_url($wc_product->get_image_id()) . '"
+                            alt="' . $wc_product->get_title() . '"
+                    >
+                </picture>
+            </div>
+            <div class="card__body">
+                <div class="card__body_main">
+                    <div class="name">' . $wc_product->get_title() . '</div>
+                    <div class="values">
+                        <div class="values__price">
+                            от ' . $price . get_woocommerce_currency_symbol($currency = '') . '
+                        </div>
+                        <div class="values__cnt">
+                            ' . $rating_html . '
+                        </div>
+                    </div>
+                    <div class="link">
+                        <div>Подробнее</div>
+                    </div>
+                </div>
+                <div class="card__body_ex">
+                    <div class="head">
+                        В категориях
+                    </div>
+                    <ul class="list">
+                        ' . $attr_html . '
+                    </ul>
+                    <div class="action">
+                        <button>
+                            Консультация в один клик
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </a>';
+
+        $result['count'] = count($products->posts);
+        $result['posts_vars'] = $products->query_vars;
+    endforeach;
+
+    $result['html'] = $html;
+    $result['current_page'] = get_query_var('paged') ? get_query_var('paged') : 1;
+    $result['max_pages'] = $products->max_num_pages;
+
+    wp_die(json_encode($result));
 }
 
 // Default status.
