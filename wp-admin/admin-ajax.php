@@ -429,10 +429,12 @@ function filter_apparatus()
 
         if ( empty($vendor) ) {
             $rating = get_field('rating', $product->ID);
-            if ( $rating ) {
-                $rating_html = '<span>' . $rating . "/10</span>";
-            } else {
-                $rating_html = '<span>0/10</span>';
+            if ( is_category(47) ) {
+                if ( $rating ) {
+                    $rating_html = '<span>' . $rating . "/10</span>";
+                } else {
+                    $rating_html = '<span>0/10</span>';
+                }
             }
 
             $big_string = '';
@@ -491,10 +493,12 @@ function filter_apparatus()
 
             if ( $product_meta['product_vendor'] && $vendor == $product_meta['product_vendor'][0] && in_array($_GET['category_id'], $product_cat) || $vendor == $product_meta['vendor'][0]) {
                 $rating = get_field('rating', $product->ID);
-                if ( $rating ) {
-                    $rating_html = '<span>' . $rating . "/10</span>";
-                } else {
-                    $rating_html = '<span>0/10</span>';
+                if ( is_category(47) ) {
+                    if ( $rating ) {
+                        $rating_html = '<span>' . $rating . "/10</span>";
+                    } else {
+                        $rating_html = '<span>0/10</span>';
+                    }
                 }
 
                 $price = wc_price($wc_product->get_regular_price(), [
@@ -615,10 +619,12 @@ function get_all_apparatus()
         ]);
 
         $rating = get_field('rating', $product->ID);
-        if ( $rating ) {
-            $rating_html = '<span>' . $rating . "/10</span>";
-        } else {
-            $rating_html = '<span>0/10</span>';
+        if ( is_category(47) ) {
+            if ( $rating ) {
+                $rating_html = '<span>' . $rating . "/10</span>";
+            } else {
+                $rating_html = '<span>0/10</span>';
+            }
         }
 
         $big_string = '';
