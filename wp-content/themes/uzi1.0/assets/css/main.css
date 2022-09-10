@@ -809,8 +809,6 @@ body {
   cursor: pointer;
   display: block !important;
   background: #FAFAFA;
-  min-height: 466px;
-  position: relative;
 }
 .card:hover {
   background-color: #fff;
@@ -835,11 +833,12 @@ body {
   display: flex;
   object-fit: contain;
 }
+.card__body {
+  position: relative;
+}
 .card__body_main {
   padding: 20px 0;
   transition: all 0.3s ease;
-  position: absolute;
-  width: 100%;
 }
 .card__body_main .name {
   font-size: 22px;
@@ -894,7 +893,6 @@ body {
   font-size: 18px;
   line-height: 18px;
   color: #2F2F2F;
-  margin-top: 15px;
   margin-bottom: 15px;
   padding: 0 20px;
 }
@@ -2246,6 +2244,7 @@ body {
   border-radius: 10px;
   background-color: #3C3C3C;
   padding: 60px 45px;
+  overflow: hidden;
 }
 .pop__head {
   display: flex;
@@ -2821,8 +2820,7 @@ body {
   display: flex;
   margin-right: -1%;
   flex-wrap: wrap;
-  row-gap: 50px;
-  padding-bottom: 100px;
+  padding-bottom: 50px;
 }
 .list__body_items_item {
   width: 31.25%;

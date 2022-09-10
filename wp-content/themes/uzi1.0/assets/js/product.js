@@ -9,9 +9,6 @@ jQuery(document).ready(function ($) {
         answer.classList.add('prod__replyto-form');
 
         answer.innerHTML = `
-        <div class="prod__comment_body_h">
-        Написать с помощью +
-        </div>
         <div class="prod__comment_body_inp">
             <input type="text" placeholder="Имя" name="name">
         </div>
@@ -66,11 +63,10 @@ jQuery(document).ready(function ($) {
             success: function (response) {
                 const reviewModal = $('.review-sent');
                 $(reviewModal).removeClass('review-sent--hide');
+                $('.prod__review-form')[0].reset();
 
                 setTimeout(function(){
-                    if ( !$(reviewModal).hasClass('review-sent--hide') ) {
-                        $(reviewModal).addClass('review-sent--hide')
-                    }
+                    $(reviewModal).addClass('review-sent--hide')
                 }, 3000);
             }
         })
@@ -102,7 +98,13 @@ jQuery(document).ready(function ($) {
                 'data' : data
             },
             success: function (response) {
-                console.log(response)
+                const reviewModal = $('.review-sent');
+                $(reviewModal).removeClass('review-sent--hide');
+                $('.prod__replyto-form')[0].reset();
+
+                setTimeout(function(){
+                    $(reviewModal).addClass('review-sent--hide')
+                }, 3000);
             }
         })
     })

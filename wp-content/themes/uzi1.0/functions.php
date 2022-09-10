@@ -857,7 +857,7 @@ function loadmore_get_posts(){
         $product_category = $product->get_category_ids();
         $rating = get_field('rating', get_the_ID());
     ?>
-        <a href="<?= $product->get_permalink() ?>" class="list__body_items_item card" id="nercard">
+        <a href="<?= $product->get_permalink() ?>" class="list__body_items_item card newcard">
             <div class="card__img">
                 <picture>
                     <source srcset="" type="image/webp">

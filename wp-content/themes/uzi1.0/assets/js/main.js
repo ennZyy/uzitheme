@@ -80,6 +80,7 @@ jQuery(document).ready(function ($) {
                     $('.list__body_items').append(data)
                     $('#loadmore').text('Показать ещё');
                     current_page++;
+                    $('input[name="current_page"]').val(current_page)
                     if (current_page == max_pages) $("#loadmore").remove();
 
                     let items = document.querySelectorAll('.list__body_items_item');
@@ -115,6 +116,7 @@ jQuery(document).ready(function ($) {
                     $('.best__ap-list').append(data)
                     $('#home-loadmore').text('Показать ещё');
                     current_page++;
+                    $('input[name="current_page"]').val(current_page)
                     if (current_page == max_pages) $("#home-loadmore").remove();
                 } else {
                     $('#home-loadmore').remove();
@@ -125,6 +127,10 @@ jQuery(document).ready(function ($) {
 
     $('#blog-loadmore').click(function () {
         $(this).text('Загрузка...');
+
+        let posts_vars = $('input[name="posts_vars"]').val()
+        let current_page = $('input[name="current_page"]').val()
+        let max_pages = $('input[name="max_pages"]').val()
 
         var data = {
             'action': 'loadmore_get_articles',
@@ -141,6 +147,7 @@ jQuery(document).ready(function ($) {
                     $('.articles__list').append(data)
                     $('#blog-loadmore').text('Показать ещё');
                     current_page++;
+                    $('input[name="current_page"]').val(current_page)
                     if (current_page == max_pages) $("#blog-loadmore").remove();
                 } else {
                     $('#blog-loadmore').remove();
@@ -170,6 +177,7 @@ jQuery(document).ready(function ($) {
                     $('.vendors__list').append(data)
                     $('#vendor-loadmore').text('Показать ещё');
                     current_page++;
+                    $('input[name="current_page"]').val(current_page)
                     if (current_page == max_pages) $("#vendor-loadmore").remove();
                 } else {
                     $('#vendor-loadmore').remove();
@@ -178,13 +186,13 @@ jQuery(document).ready(function ($) {
         });
     })
 
-    $(document).on('mouseover', '#nercard', function (e) {
+    $(document).on('mouseover', '.newcard', function (e) {
         let ex = e.currentTarget.querySelector('.card__body_ex');
 
         ex.style.cssText = `height: ${ex.scrollHeight}px`;
     })
 
-    $(document).on('mouseout', '#nercard', function (e) {
+    $(document).on('mouseout', '.newcard', function (e) {
         let ex = e.currentTarget.querySelector('.card__body_ex');
 
         ex.style.cssText = `height: 0px`;
