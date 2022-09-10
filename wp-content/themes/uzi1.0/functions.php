@@ -869,7 +869,7 @@ function loadmore_get_posts(){
             </div>
             <div class="card__body">
                 <div class="card__body_main">
-                    <div class="name"><?= $product->get_title() ?></div>
+                    <div class="name" <?php if ( strlen($product->get_title()) > 20 || in_array(48, $product_category) ): ?> style="line-height: 29px;" <?php endif; ?>><?= $product->get_title() ?></div>
                     <div class="values">
                             <div class="values__price">
                                 от <?php echo $product->get_price() . get_woocommerce_currency_symbol( $currency = '' ); ?>

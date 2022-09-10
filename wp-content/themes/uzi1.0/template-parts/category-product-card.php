@@ -12,7 +12,7 @@ $price = wc_price($product->get_regular_price(), [
 
 $rating = get_field('rating', get_the_ID());
 ?>
-<a href="<?php the_permalink(); ?>" class="list__body_items_item card" <?php if ( in_array(47, $product_category) ): ?> style="max-height: 200px; height: 100%;" <?php else: ?> style="max-height: 200px; height: 100%;" <?php endif; ?>>
+<a href="<?php the_permalink(); ?>" class="list__body_items_item card">
     <div class="card__img">
         <picture>
             <source srcset="" type="image/webp">
@@ -24,7 +24,7 @@ $rating = get_field('rating', get_the_ID());
     </div>
     <div class="card__body">
         <div class="card__body_main">
-            <div class="name" <?php if (strlen($product->get_title()) > 30): ?> style="line-height: 29px;" <?php endif; ?>><?= the_title(); ?></div>
+            <div class="name" <?php if ( strlen($product->get_title()) > 20 || in_array(48, $product_category) ): ?> style="line-height: 29px;" <?php endif; ?>><?= the_title(); ?></div>
             <div class="values">
                     <div class="values__price">
                         от <?= $price . get_woocommerce_currency_symbol(); ?>

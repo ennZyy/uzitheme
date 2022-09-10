@@ -435,6 +435,11 @@ function filter_apparatus()
                 $rating_html = '<span>0/10</span>';
             }
 
+            $big_string = '';
+            if ( strlen($wc_product->get_title()) > 20 || is_product_category(48) ) {
+                $big_string = 'style="line-height: 29px;"';
+            }
+
             $html .= '
                 <a href="' . $wc_product->get_permalink() . '" class="list__body_items_item card">
             <div class="card__img">
@@ -448,7 +453,7 @@ function filter_apparatus()
             </div>
             <div class="card__body">
                 <div class="card__body_main">
-                    <div class="name">' . $wc_product->get_title() . '</div>
+                    <div class="name" '. $big_string .'>' . $wc_product->get_title() . '</div>
                     <div class="values">
                         <div class="values__price">
                             от ' . $price . get_woocommerce_currency_symbol($currency = '') . '
@@ -499,6 +504,11 @@ function filter_apparatus()
                     'decimals'           => 0
                 ]);
 
+                $big_string = '';
+                if ( strlen($wc_product->get_title()) > 20 || is_product_category(48) ) {
+                    $big_string = 'style="line-height: 29px;"';
+                }
+
                 $html .= '<a href="' . $wc_product->get_permalink() . '" class="list__body_items_item card">
                     <div class="card__img">
                         <picture>
@@ -511,7 +521,7 @@ function filter_apparatus()
                     </div>
                     <div class="card__body">
                         <div class="card__body_main">
-                            <div class="name">' . $wc_product->get_title() . '</div>
+                            <div class="name" ' . $big_string . '>' . $wc_product->get_title() . '</div>
                             <div class="values">
                                 <div class="values__price">
                                     от ' . $price . get_woocommerce_currency_symbol($currency = '') . '
@@ -611,6 +621,11 @@ function get_all_apparatus()
             $rating_html = '<span>0/10</span>';
         }
 
+        $big_string = '';
+        if ( strlen($wc_product->get_title()) > 20 || is_product_category(48) ) {
+            $big_string = 'style="line-height: 29px;"';
+        }
+
         $html .= '
                 <a href="' . $wc_product->get_permalink() . '" class="list__body_items_item card">
             <div class="card__img">
@@ -624,7 +639,7 @@ function get_all_apparatus()
             </div>
             <div class="card__body">
                 <div class="card__body_main">
-                    <div class="name">' . $wc_product->get_title() . '</div>
+                    <div class="name" ' . $big_string . '>' . $wc_product->get_title() . '</div>
                     <div class="values">
                         <div class="values__price">
                             от ' . $price . get_woocommerce_currency_symbol($currency = '') . '
