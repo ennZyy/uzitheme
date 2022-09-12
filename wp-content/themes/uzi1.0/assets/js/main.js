@@ -1,5 +1,6 @@
 jQuery(document).ready(function ($) {
     let consultationModal = $('.feed-modal');
+    var files;
 
     $('.feed__body').on('submit', function (e) {
         e.preventDefault();
@@ -186,18 +187,6 @@ jQuery(document).ready(function ($) {
         });
     })
 
-    $(document).on('mouseover', '.newcard', function (e) {
-        let ex = e.currentTarget.querySelector('.card__body_ex');
-
-        ex.style.cssText = `height: ${ex.scrollHeight}px`;
-    })
-
-    $(document).on('mouseout', '.newcard', function (e) {
-        let ex = e.currentTarget.querySelector('.card__body_ex');
-
-        ex.style.cssText = `height: 0px`;
-    })
-
     $("button[name=filterDate]").on('click', function (e) {
         let orderBy = $('input[name="inputFilterDate"]').val();
 
@@ -273,8 +262,6 @@ jQuery(document).ready(function ($) {
             }
         })
     })
-
-    var files; // переменная. будет содержать данные файлов
 
     // заполняем переменную данными, при изменении значения поля file
     $('#uploadLogo').on('change', function(){
@@ -465,4 +452,7 @@ jQuery(document).ready(function ($) {
             consultationModal.addClass('modal-hide')
         }
     });
+    $('.footer__main_top_btn').on('click', function (e) {
+        $(window).scroll(0,0);
+    })
 })

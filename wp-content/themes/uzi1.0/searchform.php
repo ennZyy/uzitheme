@@ -1,4 +1,4 @@
-<form role="search" method="get" id="searchform" class="header__search" action="<?php echo home_url('/') ?>">
+<form role="search" method="get" id="searchFeild" class="header__search" action="<?php echo home_url('/') ?>">
     <input type="text" name="s" id="s" placeholder="Я ищу...">
     <input type="hidden" value="product, post" name="post_type"/>
     <input type="hidden" value="1" name="sentence"/>

@@ -4,10 +4,10 @@ $attributes = $product->get_attributes();
 $product_category = $product->get_category_ids();
 
 $price = wc_price($product->get_regular_price(), [
-    'price_format'       => '%2$s',
+    'price_format' => '%2$s',
     'thousand_separator' => ' ',
-    'decimal_separator'  => ' ',
-    'decimals'           => 0
+    'decimal_separator' => ' ',
+    'decimals' => 0
 ]);
 
 $rating = get_field('rating', get_the_ID());
@@ -24,11 +24,19 @@ $rating = get_field('rating', get_the_ID());
     </div>
     <div class="card__body">
         <div class="card__body_main">
-            <div class="name" <?php if ( strlen($product->get_title()) > 20 || in_array(48, $product_category) ): ?> style="line-height: 29px;" <?php endif; ?>><?= the_title(); ?></div>
+            <div class="name"
+                <?php
+                if (strlen($product->get_title()) > 55):?>
+                    style="line-height: 29px;"
+                <?php elseif (strlen($product->get_title()) > 20 || in_array(48, $product_category)): ?>
+                    style="line-height: 29px;" <?php endif; ?>
+            >
+                <?= the_title(); ?>
+            </div>
             <div class="values">
-                    <div class="values__price">
-                        от <?= $price . get_woocommerce_currency_symbol(); ?>
-                    </div>
+                <div class="values__price">
+                    от <?= $price . get_woocommerce_currency_symbol(); ?>
+                </div>
                 <?php if (!in_array(48, $product_category)): ?>
                     <div class="values__cnt">
                         <?php if (!empty($rating)): ?><span><?= $rating ?>/10</span><?php else: ?>
@@ -41,7 +49,7 @@ $rating = get_field('rating', get_the_ID());
             </div>
         </div>
         <div class="card__body_ex">
-            <?php if ( !in_array(48, $product_category) ): ?>
+            <?php if (!in_array(48, $product_category)): ?>
                 <div class="head">
                     В категориях
                 </div>
@@ -52,7 +60,7 @@ $rating = get_field('rating', get_the_ID());
             <?php endif; ?>
             <ul class="list">
                 <?php
-                if ( !in_array(48, $product_category) ):
+                if (!in_array(48, $product_category)):
                     foreach ($attributes as $attribute_item):
                         foreach (wc_get_product_terms($product->get_id(), $attribute_item->get_data()['name'], array('taxonomy' => 'sensor-frequencies')) as $value): ?>
                             <?php
@@ -69,12 +77,12 @@ $rating = get_field('rating', get_the_ID());
                     endforeach;
                 else:
                     $first_app = array_slice($product->get_upsell_ids(), 0, 2);
-                    foreach ( $first_app as $item ):
+                    foreach ($first_app as $item):
                         $similar = wc_get_product($item);
-                    ?>
+                        ?>
                         <li class="list__item">— <?= $similar->get_title() ?></li>
-                <?php
-                endforeach;
+                    <?php
+                    endforeach;
                 endif;
                 ?>
             </ul>

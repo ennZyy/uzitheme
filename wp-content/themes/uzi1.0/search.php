@@ -75,7 +75,15 @@ get_header();
                                         </div>
                                         <div class="card__body">
                                             <div class="card__body_main">
-                                                <div class="name"><?= $product->get_title() ?></div>
+                                                <div class="name"
+                                                    <?php
+                                                    if (strlen($product->get_title()) > 55):?>
+                                                        style="line-height: 29px;"
+                                                    <?php elseif (strlen($product->get_title()) > 20): ?>
+                                                        style="line-height: 29px;" <?php endif; ?>
+                                                >
+                                                    <?= the_title(); ?>
+                                                </div>
                                                 <div class="values">
                                                     <div class="values__price">
                                                         от <?php echo $product->get_regular_price() . ' ' . get_woocommerce_currency_symbol( $currency = '' ); ?>

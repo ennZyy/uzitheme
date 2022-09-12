@@ -84,16 +84,7 @@
                                     name: 'product_id',
                                     label: 'ID продукта',
                                     value: '',
-                                },
-                                {
-                                    type: 'textbox', // тип textbox = текстовое поле
-                                    name: 'text',
-                                    label: 'Текст',
-                                    value: '',
-                                    multiline: true, // большое текстовое поле - textarea
-                                    minWidth: 300, // минимальная ширина в пикселях
-                                    minHeight: 100 // минимальная высота в пикселях
-                                },
+                                }
                             ],
                             onsubmit: function( e ) { // это будет происходить после заполнения полей и нажатии кнопки отправки
                                 editor.insertContent( '[productrating  id="' + e.data.product_id + '" place="' + e.data.text + '"]');

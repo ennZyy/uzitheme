@@ -252,14 +252,6 @@ get_header();
                             </div>
                         </div>
 
-                        <div class="prod__tabs">
-                            <a href="#descripton" class="prod__tabs_item">Описание</a>
-                            <a href="#innovation" class="prod__tabs_item">Инновационные технологии</a>
-                            <a href="#characteristics" class="prod__tabs_item">Характеристики</a>
-                            <a href="#sensors" class="prod__tabs_item">Датчики</a>
-                            <a href="#examples" class="prod__tabs_item">Примеры эхограмм</a>
-                        </div>
-
                         <div class="prod__descr">
 
                             <?php if (!empty($product->get_description())): ?>
@@ -345,8 +337,14 @@ get_header();
                                                         $sensor_product = wc_get_product($item->ID);
                                                         $image = wp_get_attachment_image_url($sensor_product->get_image_id());
                                                         $attributes = $sensor_product->get_attributes();
+                                                        $price = wc_price($sensor_product->get_price(), [
+                                                            'price_format' => '%2$s',
+                                                            'thousand_separator' => ' ',
+                                                            'decimal_separator' => ' ',
+                                                            'decimals' => 0
+                                                        ]);
                                                         ?>
-                                                        <a href="<?= $item->guid ?>" class="sensors__list_item">
+                                                        <a href="<?= get_permalink($item->ID) ?>" class="sensors__list_item">
                                                             <div class="img">
                                                                 <picture>
                                                                     <source srcset="" type="image/webp">
@@ -376,7 +374,7 @@ get_header();
                                                                     <?= $item->post_excerpt ?>
                                                                 </div>
                                                                 <div class="body__info">
-                                                                    от <?= $sensor_product->get_price() ?> <?= get_woocommerce_currency_symbol() ?>
+                                                                    от <?= $price ?> <?= get_woocommerce_currency_symbol() ?>
                                                                 </div>
                                                             </div>
                                                         </a>
@@ -449,6 +447,12 @@ get_header();
                                         <?php foreach ($product->get_upsell_ids() as $id):
                                             $similar = wc_get_product($id);
                                             $rating = get_field('rating', $id);
+                                            $price = wc_price($similar->get_price(), [
+                                                'price_format' => '%2$s',
+                                                'thousand_separator' => ' ',
+                                                'decimal_separator' => ' ',
+                                                'decimals' => 0
+                                            ]);
                                             ?>
                                             <a href="<?= $similar->get_permalink() ?>" class="prod__sml_list_item card">
                                                 <div class="card__img">
@@ -462,7 +466,7 @@ get_header();
                                                         <div class="name"><?= $similar->get_title() ?></div>
                                                         <div class="values">
                                                             <div class="values__price">
-                                                                от <?= $similar->get_price() ?> <?= get_woocommerce_currency_symbol() ?>
+                                                                от <?= $price ?> <?= get_woocommerce_currency_symbol() ?>
                                                             </div>
                                                             <div class="values__cnt">
                                                                 <?php if (!empty($rating)): ?><span><?= $rating ?>

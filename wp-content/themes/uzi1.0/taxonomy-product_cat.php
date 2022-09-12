@@ -39,7 +39,7 @@ if ($_GET['attribute']) {
     ));
     $category_product_count = count($filtered_products->posts);
 } else {
-    $category_product_count = $current_category->count;
+    $category_product_count = count($products->posts);
 }
 
 $price_range = true_category_price_range($current_category->slug);
@@ -63,6 +63,20 @@ $application_area = get_terms('pa_application-area', [
 
 $apparatus_type = get_terms('pa_apparatus-type', [
     'hide_empty' => false,
+]);
+
+$price_min = wc_price($price_range['min'], [
+    'price_format'       => '%2$s',
+    'thousand_separator' => ' ',
+    'decimal_separator'  => ' ',
+    'decimals'           => 0
+]);
+
+$price_max = wc_price($price_range['max'], [
+    'price_format'       => '%2$s',
+    'thousand_separator' => ' ',
+    'decimal_separator'  => ' ',
+    'decimals'           => 0
 ]);
 
 get_header();

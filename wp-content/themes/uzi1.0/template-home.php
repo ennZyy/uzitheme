@@ -21,14 +21,14 @@ $about_us_settings = get_field('aboutus_settings');
                 <div class="tbs__in swiper">
                     <div class="tbs__wrap swiper-wrapper">
                         <?php
-                        wp_nav_menu( [
-                            'theme_location'  => '',
-                            'menu'            => 'Sub menu',
-                            'container'       => '',
-                            'menu_class'      => 'tbs__wrap swiper-wrapper',
-                            'fallback_cb'     => 'wp_page_menu',
-                            'items_wrap'      => '<ul id="%1$s" class="%2$s">%3$s</ul>',
-                        ] );
+                        wp_nav_menu([
+                            'theme_location' => '',
+                            'menu' => 'Sub menu',
+                            'container' => '',
+                            'menu_class' => 'tbs__wrap swiper-wrapper',
+                            'fallback_cb' => 'wp_page_menu',
+                            'items_wrap' => '<ul id="%1$s" class="%2$s">%3$s</ul>',
+                        ]);
                         ?>
                     </div>
                 </div>
@@ -60,12 +60,12 @@ $about_us_settings = get_field('aboutus_settings');
                         <div class="hero__body_wr">
                             <?php
                             // Add product count
-                            $application_area = get_terms( 'pa_application-area', [
+                            $application_area = get_terms('pa_application-area', [
                                 'hide_empty' => false,
-                            ] );
+                            ]);
 
                             $block_class = '';
-                            for ($i=0; $i < 3; $i++) :
+                            for ($i = 0; $i < 3; $i++) :
                                 $block_class = match ($i) {
                                     0 => 'hero__body_col_left',
                                     1 => 'hero__body_col_mid',
@@ -76,7 +76,7 @@ $about_us_settings = get_field('aboutus_settings');
                                 <div class="hero__body_col <?= $block_class ?>">
                                     <?php
                                     $categories = '';
-                                    if ($i == 0){
+                                    if ($i == 0) {
                                         $categories = array_slice($application_area, 0, 3);
                                     } elseif ($i == 1) {
                                         $categories = array_slice($application_area, 2, 3);
@@ -85,7 +85,7 @@ $about_us_settings = get_field('aboutus_settings');
                                     }
                                     $products_attr = '';
                                     foreach ($categories as $category_id):
-                                        $category = get_term_by( 'slug', $category_id->slug, 'product_cat' );
+                                        $category = get_term_by('slug', $category_id->slug, 'product_cat');
 
                                         $thumbnail_id = get_woocommerce_term_meta($category->term_id, 'thumbnail_id', true);
                                         $image = wp_get_attachment_url($thumbnail_id);
@@ -108,8 +108,10 @@ $about_us_settings = get_field('aboutus_settings');
 
                                         $product_count = $products_attr->found_posts;
                                         ?>
-                                        <a href="/product-category/ultrasound-machines/?attribute=<?= $category_id->term_id ?>" class="item w-l" style="background-image: url('<?= $image ?>');">
-                                            <div class="item__value"><?= $category_id->name ?> <span>(<?= $product_count ?>)</span></div>
+                                        <a href="/product-category/ultrasound-machines/?attribute=<?= $category_id->term_id ?>"
+                                           class="item w-l" style="background-image: url('<?= $image ?>');">
+                                            <div class="item__value"><?= $category_id->name ?>
+                                                <span>(<?= $product_count ?>)</span></div>
                                         </a>
                                     <?php endforeach; ?>
                                 </div>
@@ -118,9 +120,9 @@ $about_us_settings = get_field('aboutus_settings');
                             ?>
                         </div>
 
-<!--                        <div class="hero__body_action">-->
-<!--                            <button>Показать еще</button>-->
-<!--                        </div>-->
+                        <!--                        <div class="hero__body_action">-->
+                        <!--                            <button>Показать еще</button>-->
+                        <!--                        </div>-->
 
                     </div>
                 </div>
@@ -132,14 +134,14 @@ $about_us_settings = get_field('aboutus_settings');
                 <a href="<?= $rating_settings['url'] ?>" class="rates__in">
                     <picture>
                         <img
-                            src="<?= $rating_settings['img_url'] ?>"
-                            class="rates__bg-image"
+                                src="<?= $rating_settings['img_url'] ?>"
+                                class="rates__bg-image"
                         />
                     </picture>
-                    <?php if ( $rating_settings['text'] ): ?>
-                    <div class="rates__container">
-                        <?= $rating_settings['text'] ?>
-                    </div>
+                    <?php if ($rating_settings['text']): ?>
+                        <div class="rates__container">
+                            <?= $rating_settings['text'] ?>
+                        </div>
                     <?php endif; ?>
                 </a>
             </div>
@@ -174,7 +176,7 @@ $about_us_settings = get_field('aboutus_settings');
                             <?php while ($featured->have_posts()):
                                 $featured->the_post();
                                 get_template_part('template-parts/product', 'card');
-                            endwhile;?>
+                            endwhile; ?>
                         </div>
                     <?php endif; ?>
                 </div>
@@ -185,12 +187,12 @@ $about_us_settings = get_field('aboutus_settings');
             <div class="container">
                 <div class="pop__in">
                     <div class="pop__head">
-                        <?php if ( isset($manufacturer_settings['title']) ): ?>
+                        <?php if (isset($manufacturer_settings['title'])): ?>
                             <h3 class="pop__head_title section__title">
                                 <?= $manufacturer_settings['title'] ?>
                             </h3>
                         <?php endif; ?>
-                        <?php if ( isset($manufacturer_settings['button']) ): ?>
+                        <?php if (isset($manufacturer_settings['button'])): ?>
                             <button class="pop__head_add">
                                 <?= $manufacturer_settings['button'] ?>
                             </button>
@@ -202,7 +204,8 @@ $about_us_settings = get_field('aboutus_settings');
                                 <?php
                                 foreach ($manufacturer_settings['manufacturers'] as $vendor) :
                                     ?>
-                                    <a href="<?= get_post_permalink($vendor->ID) ?>" class="pop__slider_sl swiper-slide">
+                                    <a href="<?= get_post_permalink($vendor->ID) ?>"
+                                       class="pop__slider_sl swiper-slide">
                                         <div class="pop__slider_sl_img">
                                             <picture>
                                                 <source srcset="" type="image/webp">
@@ -211,23 +214,29 @@ $about_us_settings = get_field('aboutus_settings');
                                         </div>
                                         <div class="pop__slider_sl_name"><?= $vendor->post_title ?></div>
                                     </a>
-                                    <?php
+                                <?php
                                 endforeach;
                                 ?>
                             </div>
 
                         </div>
                         <div class="pop__slider_prev pop__slider_nav">
-                            <svg width="10" height="18" viewBox="0 0 10 18" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M9.73123 16.4998C10.0794 16.8383 10.0847 17.3995 9.74304 17.7446C9.41239 18.0786 8.87856 18.0859 8.53907 17.7611L0.283686 9.86244C-0.0875199 9.50728 -0.0954982 8.91274 0.266042 8.54754C0.615963 8.19407 1.1816 8.18859 1.53817 8.53522L9.73123 16.4998Z" fill="white"/>
-                                <path d="M8.53188 0.254442C8.86773 -0.0848123 9.41226 -0.0848122 9.74811 0.254442C10.084 0.593695 10.084 1.14373 9.74811 1.48299L1.84259 9.46854C1.50674 9.80779 0.962209 9.80779 0.626356 9.46854C0.290501 9.12928 0.290501 8.57924 0.626356 8.23999L8.53188 0.254442Z" fill="white"/>
+                            <svg width="10" height="18" viewBox="0 0 10 18" fill="none"
+                                 xmlns="http://www.w3.org/2000/svg">
+                                <path d="M9.73123 16.4998C10.0794 16.8383 10.0847 17.3995 9.74304 17.7446C9.41239 18.0786 8.87856 18.0859 8.53907 17.7611L0.283686 9.86244C-0.0875199 9.50728 -0.0954982 8.91274 0.266042 8.54754C0.615963 8.19407 1.1816 8.18859 1.53817 8.53522L9.73123 16.4998Z"
+                                      fill="white"/>
+                                <path d="M8.53188 0.254442C8.86773 -0.0848123 9.41226 -0.0848122 9.74811 0.254442C10.084 0.593695 10.084 1.14373 9.74811 1.48299L1.84259 9.46854C1.50674 9.80779 0.962209 9.80779 0.626356 9.46854C0.290501 9.12928 0.290501 8.57924 0.626356 8.23999L8.53188 0.254442Z"
+                                      fill="white"/>
                             </svg>
 
                         </div>
                         <div class="pop__slider_next pop__slider_nav">
-                            <svg width="10" height="18" viewBox="0 0 10 18" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M0.268772 1.50019C-0.079394 1.16174 -0.0847205 0.600522 0.256958 0.255384C0.587613 -0.0786183 1.12144 -0.0859278 1.46093 0.238899L9.71631 8.13756C10.0875 8.49272 10.0955 9.08726 9.73396 9.45246C9.38404 9.80593 8.8184 9.81141 8.46183 9.46478L0.268772 1.50019Z" fill="white"/>
-                                <path d="M1.46812 17.7456C1.13227 18.0848 0.587744 18.0848 0.25189 17.7456C-0.0839634 17.4063 -0.0839634 16.8563 0.25189 16.517L8.15741 8.53146C8.49326 8.19221 9.03779 8.19221 9.37364 8.53146C9.7095 8.87072 9.7095 9.42076 9.37364 9.76001L1.46812 17.7456Z" fill="white"/>
+                            <svg width="10" height="18" viewBox="0 0 10 18" fill="none"
+                                 xmlns="http://www.w3.org/2000/svg">
+                                <path d="M0.268772 1.50019C-0.079394 1.16174 -0.0847205 0.600522 0.256958 0.255384C0.587613 -0.0786183 1.12144 -0.0859278 1.46093 0.238899L9.71631 8.13756C10.0875 8.49272 10.0955 9.08726 9.73396 9.45246C9.38404 9.80593 8.8184 9.81141 8.46183 9.46478L0.268772 1.50019Z"
+                                      fill="white"/>
+                                <path d="M1.46812 17.7456C1.13227 18.0848 0.587744 18.0848 0.25189 17.7456C-0.0839634 17.4063 -0.0839634 16.8563 0.25189 16.517L8.15741 8.53146C8.49326 8.19221 9.03779 8.19221 9.37364 8.53146C9.7095 8.87072 9.7095 9.42076 9.37364 9.76001L1.46812 17.7456Z"
+                                      fill="white"/>
                             </svg>
 
                         </div>
@@ -249,16 +258,16 @@ $about_us_settings = get_field('aboutus_settings');
                         <div class="qts__slider swiper">
                             <div class="qts__slider_wr swiper-wrapper">
                                 <?php
-                                $wpb_all_query = new WP_Query(array('post_type'=>'post', 'post_status'=>'publish', 'posts_per_page'=>-1));
+                                $wpb_all_query = new WP_Query(array('post_type' => 'post', 'post_status' => 'publish', 'posts_per_page' => -1));
                                 ?>
 
-                                <?php if ( $wpb_all_query->have_posts() ) : ?>
-                                    <?php while ( $wpb_all_query->have_posts() ) : $wpb_all_query->the_post(); ?>
+                                <?php if ($wpb_all_query->have_posts()) : ?>
+                                    <?php while ($wpb_all_query->have_posts()) : $wpb_all_query->the_post(); ?>
                                         <a href="<?php the_permalink() ?>" class="qts__slider_sl swiper-slide">
                                             <div class="img">
                                                 <picture>
                                                     <source srcset="" type="image/webp">
-                                                    <?= get_the_post_thumbnail($post->ID, 'post-thumbnail', ['alt'=>$post->post_title]) ?>
+                                                    <?= get_the_post_thumbnail($post->ID, 'post-thumbnail', ['alt' => $post->post_title]) ?>
                                                 </picture>
                                             </div>
                                             <div class="descr">
@@ -281,10 +290,12 @@ $about_us_settings = get_field('aboutus_settings');
                             </div>
                         </div>
                     </div>
-                    <div class="pop__slider_next pop__slider_nav pop__slider-only">
+                    <div class="qts__next">
                         <svg width="10" height="18" viewBox="0 0 10 18" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M0.268772 1.50019C-0.079394 1.16174 -0.0847205 0.600522 0.256958 0.255384C0.587613 -0.0786183 1.12144 -0.0859278 1.46093 0.238899L9.71631 8.13756C10.0875 8.49272 10.0955 9.08726 9.73396 9.45246C9.38404 9.80593 8.8184 9.81141 8.46183 9.46478L0.268772 1.50019Z" fill="white"/>
-                            <path d="M1.46812 17.7456C1.13227 18.0848 0.587744 18.0848 0.25189 17.7456C-0.0839634 17.4063 -0.0839634 16.8563 0.25189 16.517L8.15741 8.53146C8.49326 8.19221 9.03779 8.19221 9.37364 8.53146C9.7095 8.87072 9.7095 9.42076 9.37364 9.76001L1.46812 17.7456Z" fill="white"/>
+                            <path d="M0.268772 1.50019C-0.079394 1.16174 -0.0847205 0.600522 0.256958 0.255384C0.587613 -0.0786183 1.12144 -0.0859278 1.46093 0.238899L9.71631 8.13756C10.0875 8.49272 10.0955 9.08726 9.73396 9.45246C9.38404 9.80593 8.8184 9.81141 8.46183 9.46478L0.268772 1.50019Z"
+                                  fill="white"/>
+                            <path d="M1.46812 17.7456C1.13227 18.0848 0.587744 18.0848 0.25189 17.7456C-0.0839634 17.4063 -0.0839634 16.8563 0.25189 16.517L8.15741 8.53146C8.49326 8.19221 9.03779 8.19221 9.37364 8.53146C9.7095 8.87072 9.7095 9.42076 9.37364 9.76001L1.46812 17.7456Z"
+                                  fill="white"/>
                         </svg>
                     </div>
                 </div>
@@ -304,16 +315,17 @@ $about_us_settings = get_field('aboutus_settings');
                             <br>
                             консультацию от наших специалистов
                         </div>
-                        <input type="tel" id="telInput" name="userPhone" class="feed__body_input" placeholder="+7 (495) 555-55-55">
+                        <input type="tel" id="telInput" name="userPhone" class="feed__body_input"
+                               placeholder="+7 (495) 555-55-55">
                         <button class="feed__body_btn">
                             Получить консультацию
                         </button>
                         <div class="feed__body_link">
                             при нажатии на кнопку вы соглашаетесь с <a href="
                             <?php
-                            if(isset($policy_url['url'])){
+                            if (isset($policy_url['url'])) {
                                 echo $policy_url['url'];
-                            }else{
+                            } else {
                                 echo get_page_link(3);
                             } ?>">политикой конфиденциальности</a>
                         </div>
@@ -321,8 +333,10 @@ $about_us_settings = get_field('aboutus_settings');
                     <div class="feed__img">
                         <picture>
                             <source srcset="" type="image/webp">
-                            <source srcset="<?php echo get_template_directory_uri() ?>/assets/img/feed/feed-mob-mini-img.png" media="(max-width:650px)" type="image/webp">
-                            <source srcset="<?php echo get_template_directory_uri() ?>/assets/img/feed/feed-mob-img.png" media="(max-width:900px)" type="image/webp">
+                            <source srcset="<?php echo get_template_directory_uri() ?>/assets/img/feed/feed-mob-mini-img.png"
+                                    media="(max-width:650px)" type="image/webp">
+                            <source srcset="<?php echo get_template_directory_uri() ?>/assets/img/feed/feed-mob-img.png"
+                                    media="(max-width:900px)" type="image/webp">
 
                             <img src="<?php echo get_template_directory_uri() ?>/assets/img/feed/feed-img.png" alt="">
                         </picture>
@@ -347,7 +361,7 @@ $about_us_settings = get_field('aboutus_settings');
                             'tax_query' => array(
                                 array(
                                     'taxonomy' => 'product_cat',
-                                     'field' => 'slug',
+                                    'field' => 'slug',
                                     'terms' => 'ultrasound-machines',
                                 )
                             )
@@ -358,13 +372,16 @@ $about_us_settings = get_field('aboutus_settings');
                                 <?php while ($featured->have_posts()):
                                     $featured->the_post();
                                     get_template_part('template-parts/second-product', 'card');
-                                endwhile;?>
+                                endwhile; ?>
                             </div>
                         <?php endif; ?>
                     </div>
                     <?php if ($featured->max_num_pages > 1) : ?>
-                        <input type="hidden" value='<?php echo json_encode($featured->query_vars); ?>' name="posts_vars">
-                        <input type="hidden" value="<?php echo (get_query_var('paged')) ? get_query_var('paged') : 1; ?>" name="current_page">
+                        <input type="hidden" value='<?php echo json_encode($featured->query_vars); ?>'
+                               name="posts_vars">
+                        <input type="hidden"
+                               value="<?php echo (get_query_var('paged')) ? get_query_var('paged') : 1; ?>"
+                               name="current_page">
                         <input type="hidden" value="<?php echo $featured->max_num_pages; ?>" name="max_pages">
                         <div class="apr__action">
                             <button id="home-loadmore">Показать еще</button>
@@ -399,8 +416,11 @@ $about_us_settings = get_field('aboutus_settings');
                         </div>
                         <div class="revs__body_thumbs_l">
                             <div class="revs__body_thumbs_nav revs__body_thumbs_nav_prev">
-                                <svg width="13" height="25" viewBox="0 0 13 25" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                    <path fill-rule="evenodd" clip-rule="evenodd" d="M12.6895 23.9503C13.1035 23.5378 13.1035 22.8689 12.6895 22.4563L2.50592 12.3074L12.3037 2.5431C12.7176 2.13053 12.7176 1.46163 12.3037 1.04906C11.8897 0.636492 11.2185 0.636494 10.8045 1.04906L0.310428 11.5074C-0.103552 11.9199 -0.103552 12.5888 0.310429 13.0014C0.355894 13.0467 0.404461 13.087 0.45545 13.1224C0.507053 13.2571 0.587332 13.3835 0.696282 13.4921L11.1904 23.9503C11.6043 24.3629 12.2755 24.3629 12.6895 23.9503Z" fill="#2F2F2F"/>
+                                <svg width="13" height="25" viewBox="0 0 13 25" fill="none"
+                                     xmlns="http://www.w3.org/2000/svg">
+                                    <path fill-rule="evenodd" clip-rule="evenodd"
+                                          d="M12.6895 23.9503C13.1035 23.5378 13.1035 22.8689 12.6895 22.4563L2.50592 12.3074L12.3037 2.5431C12.7176 2.13053 12.7176 1.46163 12.3037 1.04906C11.8897 0.636492 11.2185 0.636494 10.8045 1.04906L0.310428 11.5074C-0.103552 11.9199 -0.103552 12.5888 0.310429 13.0014C0.355894 13.0467 0.404461 13.087 0.45545 13.1224C0.507053 13.2571 0.587332 13.3835 0.696282 13.4921L11.1904 23.9503C11.6043 24.3629 12.2755 24.3629 12.6895 23.9503Z"
+                                          fill="#2F2F2F"/>
                                 </svg>
 
 
@@ -418,13 +438,15 @@ $about_us_settings = get_field('aboutus_settings');
                                 </div>
                             </div>
                             <div class="revs__body_thumbs_nav revs__body_thumbs_nav_next">
-                                <svg width="13" height="25" viewBox="0 0 13 25" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                    <path fill-rule="evenodd" clip-rule="evenodd" d="M0.310485 1.04917C-0.103495 1.46174 -0.103495 2.13065 0.310485 2.54321L10.4941 12.6921L0.696279 22.4564C0.282299 22.869 0.282299 23.5379 0.696279 23.9505C1.11026 24.363 1.78145 24.363 2.19543 23.9505L12.6895 13.4922C13.1035 13.0796 13.1035 12.4107 12.6895 11.9981C12.6441 11.9528 12.5955 11.9125 12.5446 11.8772C12.493 11.7424 12.4127 11.6161 12.3037 11.5075L1.80964 1.04917C1.39566 0.636604 0.724465 0.636604 0.310485 1.04917Z" fill="#2F2F2F"/>
+                                <svg width="13" height="25" viewBox="0 0 13 25" fill="none"
+                                     xmlns="http://www.w3.org/2000/svg">
+                                    <path fill-rule="evenodd" clip-rule="evenodd"
+                                          d="M0.310485 1.04917C-0.103495 1.46174 -0.103495 2.13065 0.310485 2.54321L10.4941 12.6921L0.696279 22.4564C0.282299 22.869 0.282299 23.5379 0.696279 23.9505C1.11026 24.363 1.78145 24.363 2.19543 23.9505L12.6895 13.4922C13.1035 13.0796 13.1035 12.4107 12.6895 11.9981C12.6441 11.9528 12.5955 11.9125 12.5446 11.8772C12.493 11.7424 12.4127 11.6161 12.3037 11.5075L1.80964 1.04917C1.39566 0.636604 0.724465 0.636604 0.310485 1.04917Z"
+                                          fill="#2F2F2F"/>
                                 </svg>
 
                             </div>
                         </div>
-
                     </div>
                 </div>
             </div>

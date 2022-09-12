@@ -115,7 +115,13 @@ get_header();
                                     foreach ( $products as $product ):
                                         $vendor_product = wc_get_product($product->ID);
                                         $image = wp_get_attachment_image_url($vendor_product->get_image_id());
-                                        $product_attributes = $vendor_product->get_attributes();?>
+                                        $product_attributes = $vendor_product->get_attributes();
+                                        $price = wc_price($vendor_product->get_price(), [
+                                            'price_format'       => '%2$s',
+                                            'thousand_separator' => ' ',
+                                            'decimal_separator'  => ' ',
+                                            'decimals'           => 0
+                                        ]);?>
                                         <a href="<?= $vendor_product->get_permalink() ?>" class="list__item card">
                                             <div class="card__img">
                                                 <picture>
@@ -125,10 +131,18 @@ get_header();
                                             </div>
                                             <div class="card__body">
                                                 <div class="card__body_main">
-                                                    <div class="name"><?= $vendor_product->get_title() ?></div>
+                                                    <div class="name"
+                                                        <?php
+                                                        if (strlen($vendor_product->get_title()) > 55):?>
+                                                            style="line-height: 29px;"
+                                                        <?php elseif (strlen($vendor_product->get_title()) > 20): ?>
+                                                            style="line-height: 29px;" <?php endif; ?>
+                                                    >
+                                                        <?= $vendor_product->get_title() ?>
+                                                    </div>
                                                     <div class="values">
                                                         <div class="values__price">
-                                                            от <?= $vendor_product->get_price() ?> <?= get_woocommerce_currency_symbol() ?>
+                                                            от <?= $price ?> <?= get_woocommerce_currency_symbol() ?>
                                                         </div>
                                                         <div class="values__cnt">
                                                             <?php if ( !empty($product->rating) ): ?><span><?= $product->rating ?>/10</span><?php else: ?><span>0/10</span><?php endif; ?>
@@ -171,10 +185,13 @@ get_header();
                                 </div>
                                 <?php endfor; ?>
 
+                                <?php if ( count($vendor_products) > 3 ): ?>
                                 <div class="more">
                                     <button class="more__btn vendor__product-more">Показать еще</button>
                                 </div>
+                                <?php endif; ?>
                             </div>
+
                             <?php
                             endif;
                             if ( $vendor_sensors ) : ?>
@@ -203,6 +220,12 @@ get_header();
                                         $sensor_product = wc_get_product($sensor->ID);
                                         $image = wp_get_attachment_image_url($sensor_product->get_image_id());
                                         $attributes = $sensor_product->get_attributes();
+                                        $price = wc_price($sensor_product->get_price(), [
+                                            'price_format'       => '%2$s',
+                                            'thousand_separator' => ' ',
+                                            'decimal_separator'  => ' ',
+                                            'decimals'           => 0
+                                        ]);
                                     ?>
                                     <a href="<?= $sensor_product->get_permalink() ?>" class="list__item card">
                                         <div class="card__img">
@@ -213,10 +236,18 @@ get_header();
                                         </div>
                                         <div class="card__body">
                                             <div class="card__body_main">
-                                                <div class="name"><?= $sensor_product->get_title() ?></div>
+                                                <div class="name"
+                                                    <?php
+                                                    if (strlen($sensor_product->get_title()) > 55):?>
+                                                        style="line-height: 29px;"
+                                                    <?php elseif (strlen($sensor_product->get_title()) > 20): ?>
+                                                        style="line-height: 29px;" <?php endif; ?>
+                                                >
+                                                    <?= $sensor_product->get_title() ?>
+                                                </div>
                                                 <div class="values">
                                                     <div class="values__price">
-                                                        от <?= $sensor_product->get_price() ?> <?= get_woocommerce_currency_symbol() ?>
+                                                        от <?= $price ?> <?= get_woocommerce_currency_symbol() ?>
                                                     </div>
 
                                                 </div>
@@ -250,9 +281,12 @@ get_header();
                                     <?php endforeach; ?>
                                 </div>
                             <?php endfor; ?>
+
+                                <?php if ( count($vendor_sensors) ): ?>
                                 <div class="more">
                                     <button class="more__btn sensor__more">Показать еще</button>
                                 </div>
+                                <?php endif; ?>
                             </div>
                         <?php endif; ?>
                         </div>

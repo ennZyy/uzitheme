@@ -856,6 +856,12 @@ function loadmore_get_posts(){
         $attributes = $product->get_attributes();
         $product_category = $product->get_category_ids();
         $rating = get_field('rating', get_the_ID());
+        $price = wc_price($product->get_price(), [
+            'price_format' => '%2$s',
+            'thousand_separator' => ' ',
+            'decimal_separator' => ' ',
+            'decimals' => 0
+        ]);
     ?>
         <a href="<?= $product->get_permalink() ?>" class="list__body_items_item card newcard">
             <div class="card__img">
@@ -872,7 +878,7 @@ function loadmore_get_posts(){
                     <div class="name" <?php if ( strlen($product->get_title()) > 20 || in_array(48, $product_category) ): ?> style="line-height: 29px;" <?php endif; ?>><?= $product->get_title() ?></div>
                     <div class="values">
                             <div class="values__price">
-                                от <?php echo $product->get_price() . get_woocommerce_currency_symbol( $currency = '' ); ?>
+                                от <?= $price . get_woocommerce_currency_symbol( $currency = '' ); ?>
                             </div>
                         <?php if ( !in_array(48, $product_category) ): ?>
                         <div class="values__cnt">
