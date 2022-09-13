@@ -39,7 +39,7 @@ if ($_GET['attribute']) {
     ));
     $category_product_count = count($filtered_products->posts);
 } else {
-    $category_product_count = count($products->posts);
+    $category_product_count = $current_category->count;
 }
 
 $price_range = true_category_price_range($current_category->slug);

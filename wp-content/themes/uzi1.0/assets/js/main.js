@@ -323,18 +323,23 @@ jQuery(document).ready(function ($) {
             url += '&max='+$('input[name="tprice"]').val()
         }
 
+        let vendorCount = 0;
         $("input[id*='vendor-']").each(function (i, el) {
-            //It'll be an array of elements
             if ( $(el).prop('checked') ) {
-                url += '&vendor='+$(el).val()
+                vendorCount++;
+                if ( vendorCount > 1 ) {
+                    url += ';'+$(el).val();
+                } else {
+                    url += '&vendor='+$(el).val();
+                }
             }
         });
 
-        let count = 0;
+        let attributeCount = 0;
         $("input[id*='attribute-']").each(function (i, el) {
             if ( $(el).prop('checked') ) {
-                count++;
-                if ( count > 1 ) {
+                attributeCount++;
+                if ( attributeCount > 1 ) {
                     url += ';'+$(el).val();
                 } else {
                     url += '&attribute='+$(el).val();
@@ -342,23 +347,25 @@ jQuery(document).ready(function ($) {
             }
         });
 
+        let typeCount = 0;
         $("input[id*='type-']").each(function (i, el) {
-            //It'll be an array of elements
             if ( $(el).prop('checked') ) {
-                count++;
-                if ( count > 1 ) {
+                typeCount++;
+                if ( typeCount > 1 ) {
                     url += '&type='+$(el).val();
                 } else {
                     url += '&type='+$(el).val();
                 }
             }
         });
+        console.log(url)
 
         $.ajax({
             type: 'POST',
             url: url,
             success: function(response) {
                 let result = JSON.parse(response);
+                // console.log(response)
                 let postsVars = result["posts_vars"];
                 let currentPage = result["current_page"];
                 let max_pages = result["max_pages"];
@@ -368,6 +375,7 @@ jQuery(document).ready(function ($) {
 
                 $('input[name="posts_vars"]').val(JSON.stringify(postsVars));
                 $('input[name="max_pages"]').val(max_pages);
+                $('input[name="current_page"]').val(currentPage)
                 let current_page = $('input[name="current_page"]').val()
                 current_page = currentPage;
 
@@ -379,22 +387,14 @@ jQuery(document).ready(function ($) {
                     }
                 }
 
-                let count = (result['html'].match(/list__body_items_item/g) || []).length;
+                let count = result['count'];
                 $('.filter__item_info span').text(`(${count})`);
+
+                if ( count <= 0 ) {
+                    $('button#loadmore').remove();
+                }
             }
         })
-    })
-
-    $(document).on('mouseover', '.card', function (e) {
-        let ex = e.currentTarget.querySelector('.card__body_ex');
-
-        ex.style.cssText = `height: ${ex.scrollHeight}px`;
-    })
-
-    $(document).on('mouseout', '.card', function (e) {
-        let ex = e.currentTarget.querySelector('.card__body_ex');
-
-        ex.style.cssText = `height: 0px`;
     })
 
     $('.filter__item-reset').on('click', function (e) {
@@ -414,10 +414,32 @@ jQuery(document).ready(function ($) {
 
                 console.log(result)
 
+                $("input[id*='vendor-']").each(function (i, el) {
+                    if ( $(el).prop('checked') ) {
+                        $(el).prop('checked', false);
+                    }
+                });
+
+                $("input[id*='attribute-']").each(function (i, el) {
+                    if ( $(el).prop('checked') ) {
+                        $(el).prop('checked', false);
+                    }
+                });
+
+                $("input[id*='type-']").each(function (i, el) {
+                    if ( $(el).prop('checked') ) {
+                        $(el).prop('checked', false);
+                    }
+                });
+
+                $('input[name="fprice"]').val('');
+                $('input[name="tprice"]').val();
+
                 wrapper.html(result['html']);
 
                 $('input[name="posts_vars"]').val(JSON.stringify(postsVars));
                 $('input[name="max_pages"]').val(max_pages);
+                $('input[name="current_page"]').val(result["current_page"])
                 let current_page = $('input[name="current_page"]').val()
                 current_page = currentPage;
 
@@ -429,10 +451,22 @@ jQuery(document).ready(function ($) {
                     }
                 }
 
-                let count = (result['html'].match(/list__body_items_item/g) || []).length;
+                let count = result['count'];
                 $('.filter__item_info span').text(`(${count})`);
             }
         })
+    })
+
+    $(document).on('mouseover', '.card', function (e) {
+        let ex = e.currentTarget.querySelector('.card__body_ex');
+
+        ex.style.cssText = `height: ${ex.scrollHeight}px`;
+    })
+
+    $(document).on('mouseout', '.card', function (e) {
+        let ex = e.currentTarget.querySelector('.card__body_ex');
+
+        ex.style.cssText = `height: 0px`;
     })
 
     $('.product-action-consultation').on('click', function (e) {

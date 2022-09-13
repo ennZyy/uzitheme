@@ -10,14 +10,14 @@ jQuery(document).ready(function ($) {
 
         answer.innerHTML = `
         <div class="prod__comment_body_inp">
-            <input type="text" placeholder="Имя" name="name">
+            <input type="text" placeholder="Имя" name="name" required>
         </div>
         <div class="prod__comment_body_inp">
-            <input type="email" placeholder="Email" name="email">
+            <input type="email" placeholder="Email" name="email" required>
             <div class="prod__comment_body_inp_ex">*Email будет скрыт </div>
         </div>
         <div class="prod__comment_body_text">
-            <textarea placeholder="Комментарий..." name="text"></textarea>
+            <textarea placeholder="Комментарий..." name="text" required></textarea>
         </div>
         <div class="prod__comment_body_action">
             <button class="prod__comment_body_action_btn answer__btn">Отправить</button>

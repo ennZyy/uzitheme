@@ -229,7 +229,7 @@ $phone = str_replace(array('+', ' ', '(', ')', '-'), '', $footer_settings['conta
 <!-- Popup "Ваш отзыв отправлен, после модерации он появится на сайте" -->
 <div class="review-sent review-sent--hide">
     <i class="review-sent__close close"></i>
-    <p class="review-sent__text">Ваш отзыв отправлен, после модерации он появится на сайте</p>
+    <p class="review-sent__text">Ваш комментарий отправлен, после модерации он появится на сайте</p>
 </div>
 <!-- Конец Popup "Ваш отзыв отправлен, после модерации он появится на сайте" -->
 

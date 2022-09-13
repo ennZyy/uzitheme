@@ -327,7 +327,7 @@ function filter_apparatus()
 
     $min = $_GET['min'] ?? 0;
 
-    $max = $_GET['max'] ?? 99999999;
+    $max = $_GET['max'] ?? 99999999999;
 
     if (isset($_GET['vendor']) && !empty($_GET['vendor'])) {
         $vendor = $_GET['vendor'];
@@ -401,6 +401,17 @@ function filter_apparatus()
         'tax_query' => $args,
         'meta_query' => $meta_query
     ));
+
+    $c_products = new WP_Query(array(
+        'post_type' => 'product',
+        'posts_per_page' => '-1',
+        'meta_key' => '_price',
+        'order' => 'asc',
+        'tax_query' => $args,
+        'meta_query' => $meta_query
+    ));
+
+    $count = count($c_products->posts);
 
     $html = '';
     foreach ($products->posts as $product) :
@@ -484,14 +495,14 @@ function filter_apparatus()
             </div>
         </a>';
 
-        $result['count'] = count($products->posts);
+        $result['count'] = $count;
         $result['posts_vars'] = $products->query_vars;
         } else {
             $t_product = wc_get_product($product->ID);
             $product_meta = get_post_meta($product->ID);
             $product_cat = $t_product->get_category_ids();
 
-            if ( $product_meta['product_vendor'] && $vendor == $product_meta['product_vendor'][0] && in_array($_GET['category_id'], $product_cat) || $vendor == $product_meta['vendor'][0]) {
+            if ( $product_meta['product_vendor'] || $vendor == $product_meta['product_vendor'][0]  || $vendor == $product_meta['vendor'][0] && in_array($_GET['category_id'], $product_cat)) {
                 $rating = get_field('rating', $product->ID);
                 if ( is_category(47) ) {
                     if ( $rating ) {
@@ -555,7 +566,7 @@ function filter_apparatus()
 
                 </a>';
 
-                $result['count'] = count($products->posts);
+                $result['count'] = $count;
                 $result['posts_vars'] = $products->query_vars;
             }
         }
@@ -673,10 +684,23 @@ function get_all_apparatus()
                 </div>
             </div>
         </a>';
-
-        $result['count'] = count($products->posts);
         $result['posts_vars'] = $products->query_vars;
     endforeach;
+
+    $count_product = new WP_Query(array(
+        'post_type' => 'product',
+        'posts_per_page' => '-1',
+        'order' => 'asc',
+        'tax_query' => array(
+            array(
+                'taxonomy' => 'product_cat',
+                'field' => 'term_id',
+                'terms' => $_GET['category_id'],
+            ),
+        )
+    ));
+
+    $result['count'] = count($count_product->posts);
 
     $result['html'] = $html;
     $result['current_page'] = get_query_var('paged') ? get_query_var('paged') : 1;
